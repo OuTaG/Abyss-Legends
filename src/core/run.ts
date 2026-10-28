@@ -405,7 +405,9 @@ export class Run {
 
   private ouvrirMystere(rng: Rng): void {
     let pool: EventDef[] = this.data.rencontres.mysteres.filter((e) => !this.mysteresVus.includes(e.id));
-    if (this.prog.combatsNormaux >= this.data.prov.tirage_sonar.combats_normaux_max) pool = pool.filter((e) => e.id !== 'embuscade');
+    const cfgS = this.data.prov.tirage_sonar;
+    const reserve = this.prog.combatsParTiers.reduce((a, n) => a + Math.max(0, cfgS.combat_min_par_tiers - n), 0);
+    if (this.prog.combatsNormaux + reserve >= cfgS.combats_normaux_max) pool = pool.filter((e) => e.id !== 'embuscade');
     const ev = rng.pick(pool.length ? pool : this.data.rencontres.mysteres);
     this.mysteresVus.push(ev.id);
     this.rencontre = {

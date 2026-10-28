@@ -28,7 +28,7 @@ fs.mkdirSync(OUT, { recursive: true });
   };
   const get = (fn, arg) => page.evaluate(fn, arg);
 
-  await page.evaluate((n) => { window.__abyss.profil.parametres.niveau = n; window.__abyss.menu(); }, NIVEAU);
+  await page.evaluate(([n, p, a]) => { const pr = window.__abyss.profil.parametres; pr.niveau = n; if (p) pr.preset = p; pr.abonne = !!a; window.__abyss.menu(); }, [NIVEAU, process.env.PRESET, process.env.ABO]);
   await page.waitForTimeout(300);
   await snap('01-ecran-principal');
   await page.evaluate(() => { document.querySelector('.menu').scrollTop = 2000; });

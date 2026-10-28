@@ -1,0 +1,44 @@
+name: Prévisualisation par branche
+
+# Chaque push sur une branche : tests + build + déploiement sur GitHub Pages dans /previews/<branche>/.
+# Activation (une seule fois) : Settings > Pages > Source = "Deploy from a branch" > branche gh-pages, dossier / (root).
+# URL : https://<utilisateur>.github.io/<depot>/previews/<branche>/
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-et-deploiement:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - name: Nom de dossier de la branche
+        id: slug
+        run: echo "nom=$(echo '${{ github.ref_name }}' | tr '/_' '--' | tr -cd 'A-Za-z0-9.-' )" >> "$GITHUB_OUTPUT"
+      - name: Déployer la prévisualisation
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          destination_dir: previews/${{ steps.slug.outputs.nom }}
+          keep_files: true
+          commit_message: "Prévisualisation de ${{ github.ref_name }} (${{ github.sha }})"
+      - name: Adresse de la prévisualisation
+        run: echo "Prévisualisation https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/previews/${{ steps.slug.outputs.nom }}/" >> "$GITHUB_STEP_SUMMARY"

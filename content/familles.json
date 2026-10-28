@@ -1,0 +1,31 @@
+{
+  "_doc": "Les 6 familles communes (GDD 4.4), identiques dans tous les mondes : seul l'habillage (nom, element) change dans content/worlds/. Chaque famille a un role et un comportement parmi les comportements generiques du moteur (poison, charge, embuscade, armure, distance, essaim). Tous les chiffres ici sont PROVISOIRES (poids relatifs au sein d'un groupe).",
+  "tiers": [
+    { "echelle": 1.0, "suffixe": "" },
+    { "echelle": 1.2, "suffixe": " costaud" },
+    { "echelle": 1.4, "suffixe": " géant" }
+  ],
+  "familles": {
+    "essaim":   { "role": "Essaim",   "comportement": "essaim",  "pv": 0.4, "atk": 0.5, "intervalle": 1.3, "forme": "poisson" },
+    "cuirasse": { "role": "Cuirassé", "comportement": "armure",  "pv": 2.2, "atk": 0.7, "intervalle": 2.4, "armure": 0.3, "forme": "crabe" },
+    "piqueur":  { "role": "Piqueur",  "comportement": "poison",  "pv": 0.8, "atk": 0.5, "intervalle": 1.7, "poison_dps": 0.22, "poison_duree": 4, "faiblesse": 0.08, "forme": "meduse" },
+    "chargeur": { "role": "Chargeur", "comportement": "charge",  "pv": 1.2, "atk": 1.0, "intervalle": 3.6, "charge_prep": 1.0, "charge_mult": 2.4, "forme": "raie" },
+    "embusque": { "role": "Embusqué", "comportement": "embuscade","pv": 0.8, "atk": 0.9, "intervalle": 2.1, "embuscade_delai": 1.4, "embuscade_mult": 3.0, "forme": "anguille" },
+    "tireur":   { "role": "Tireur",   "comportement": "distance","pv": 0.7, "atk": 0.9, "intervalle": 1.5, "forme": "crevette" }
+  },
+  "groupes": [
+    { "id": "banc", "familles": ["essaim", "essaim", "essaim", "essaim"], "poids": 3 },
+    { "id": "garde", "familles": ["cuirasse", "tireur"], "poids": 3 },
+    { "id": "piqures", "familles": ["piqueur", "piqueur", "essaim"], "poids": 2 },
+    { "id": "charge", "familles": ["chargeur", "essaim", "essaim"], "poids": 2 },
+    { "id": "embuscade", "familles": ["embusque", "embusque"], "poids": 2 },
+    { "id": "mixte", "familles": ["cuirasse", "piqueur", "tireur"], "poids": 2 },
+    { "id": "tir", "familles": ["tireur", "tireur", "essaim"], "poids": 2 },
+    { "id": "stampede", "familles": ["chargeur", "chargeur"], "poids": 1 }
+  ],
+  "boss_pattern": {
+    "_doc": "Capacites des mini-boss et du boss (PROVISOIRE).",
+    "miniboss": { "lourde_toutes_s": 9, "lourde_prep": 1.2, "lourde_mult": 2.2, "enrage_sous": 0.4, "enrage_atk": 1.25, "renforts": [] },
+    "boss": { "lourde_toutes_s": 7, "lourde_prep": 1.2, "lourde_mult": 2.6, "enrage_sous": 0.5, "enrage_atk": 1.3, "renforts": [0.66, 0.33], "renforts_famille": "essaim", "renforts_nombre": 2 }
+  }
+}

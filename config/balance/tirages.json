@@ -1,0 +1,163 @@
+{
+  "_doc": "Tirages (GDD 8.7). Tous les coffres d'épave sont en boutique : on les ouvre avec la clé de leur qualité, ou on les achète en gemmes. Une seule qualité de coffre d'or. Probabilités par rareté d'origine [Commun, Original, Rare, Epique, Legendaire] ; le meilleur résultat possible est Légendaire. Les tirages payants utilisent exactement les mêmes tables et leurs propres compteurs : un achat donne plus de tirages, jamais de meilleures chances, et ne modifie jamais les tirages gratuits.",
+  "raretes": [
+    "Commun",
+    "Original",
+    "Rare",
+    "Epique",
+    "Legendaire"
+  ],
+  "tables": {
+    "bois": [
+      0.8,
+      0.18,
+      0.02,
+      0.0,
+      0.0
+    ],
+    "fer": [
+      0.55,
+      0.33,
+      0.11,
+      0.01,
+      0.0
+    ],
+    "laiton": [
+      0.25,
+      0.4,
+      0.27,
+      0.075,
+      0.005
+    ],
+    "or": [
+      0.0,
+      0.27,
+      0.4,
+      0.21,
+      0.12
+    ],
+    "nacre": [
+      0.0,
+      0.0,
+      0.2,
+      0.35,
+      0.45
+    ]
+  },
+  "coffres_boutique": {
+    "_doc": "Chaque coffre : 1 clé de sa qualité OU son prix en gemmes ; 1 objet.",
+    "bois": {
+      "cle": "bois",
+      "cles": 1,
+      "prix_gemmes": 30,
+      "objets": 1
+    },
+    "fer": {
+      "cle": "fer",
+      "cles": 1,
+      "prix_gemmes": 60,
+      "objets": 1
+    },
+    "laiton": {
+      "cle": "laiton",
+      "cles": 1,
+      "prix_gemmes": 120,
+      "objets": 1
+    },
+    "or": {
+      "cle": "or",
+      "cles": 1,
+      "prix_gemmes": 200,
+      "objets": 1
+    },
+    "nacre": {
+      "cle": "nacre",
+      "cles": 1,
+      "prix_gemmes": 700,
+      "objets": 1
+    }
+  },
+  "poids_emplacements": {
+    "arme": 0.1667,
+    "casque": 0.1667,
+    "armure": 0.1667,
+    "palmes": 0.1667,
+    "montre": 0.1667,
+    "bouteilles": 0.1665
+  },
+  "_doc_poids": "Chaque pièce a la même chance (GDD 8.7).",
+  "cles_premiere_fois_par_niveau": {
+    "_doc": "Récompense extraordinaire : uniquement la première fois. 1 clé en atteignant le choix 10, 1 clé en atteignant le choix 20 (même si l'on meurt ensuite), 2 clés à la victoire. Les clés sont les mêmes dans tous les mondes ; seuls les niveaux du boss n°8 (un niveau sur 8) donnent de meilleures clés.",
+    "niveau_normal": {
+      "choix_10": "fer",
+      "choix_20": "fer",
+      "fin": [
+        "laiton",
+        "laiton"
+      ]
+    },
+    "niveau_boss_8": {
+      "choix_10": "laiton",
+      "choix_20": "laiton",
+      "fin": [
+        "laiton",
+        "or"
+      ]
+    }
+  },
+  "coffre_quotidien": {
+    "_doc": "Le même dans tous les mondes ; jamais déterminant.",
+    "coffre": "laiton"
+  },
+  "pub_quotidienne": {
+    "cle": "laiton",
+    "oeufs_abysses": 1
+  },
+  "coffre_temps_de_jeu": {
+    "minutes": 20,
+    "coffre": "fer",
+    "_doc": "Récompense de temps passé : tirage basique."
+  },
+  "hors_ligne": {
+    "coffre_toutes_les_h": 4,
+    "coffre": "bois",
+    "oeuf_basique_toutes_les_h": 8,
+    "_doc": "Tirages basiques (GDD 9.1)."
+  },
+  "oeufs_abysses": {
+    "basique": [
+      0.6,
+      0.3,
+      0.1,
+      0.0,
+      0.0
+    ],
+    "abysses": [
+      0.2,
+      0.35,
+      0.3,
+      0.13,
+      0.02
+    ]
+  },
+  "huitres": {
+    "raretes": [
+      "Commun",
+      "Original",
+      "Rare",
+      "Epique",
+      "Legendaire"
+    ],
+    "probas": [
+      0.42,
+      0.3,
+      0.18,
+      0.07,
+      0.03
+    ]
+  },
+  "modeles_armes": {
+    "_doc": "Types d'armes (harpon, trident…). Une copie 'identique' = la même arme (même type). Hypothèse : 6 types, chacun également probable ; l'élément (classe) n'entre pas dans l'identité (à valider).",
+    "nombre": 6
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_doc": "XP de partie (remise à zéro à chaque partie). XP nécessaire pour passer du niveau k au niveau k+1 = base x croissance^(k-1). L'XP gagnée par combat est fixe : les premiers niveaux viennent vite, les suivants lentement.",
+  "xp_niveau_base": 8,
+  "croissance_xp_niveau": 1.25,
+  "xp_combat_normal": 11,
+  "xp_mini_boss": 25,
+  "xp_boss": 0,
+  "_doc_total": "5 combats normaux x 11 + 2 mini-boss x 25 = 105 XP avant le boss : niveau 7 (seuil 90 XP ; niveau 8 à 121 XP). Avec +100 % d'XP (arbre permanent, environ 3 mois), 210 XP : niveau 10 (seuil 207 XP).",
+  "bonus_puissance_par_niveau_au_dela_de_7": 0.08,
+  "_doc_bonus": "La difficulté est calée sur un héros de niveau 7 en fin de partie. Chaque niveau de partie au-delà ajoute +8 % de puissance effective (multiplicatif)."
+}

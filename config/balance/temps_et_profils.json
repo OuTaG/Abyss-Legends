@@ -1,0 +1,129 @@
+{
+  "_doc": "Durée d'une partie (niveau) et profils de joueurs simulés. Les durées sont en secondes de temps réel, à vitesse de combat normale (x1). L'abonnement divise seulement le temps des combats par 2, pas celui des choix.",
+  "partie": {
+    "choix_sonar": 30,
+    "duree_choix_sonar_s": 7,
+    "nombre_choix_mutation": 8,
+    "duree_choix_mutation_s": 6,
+    "combats_normaux_moyens": 5,
+    "mini_boss": 2,
+    "duree_combat_normal_s": 35,
+    "duree_mini_boss_s": 50,
+    "duree_boss_s": 75,
+    "_doc_fraction": "Part du temps de la partie écoulée quand le joueur meurt à ce contrôle (mini-boss du choix 10, du choix 20, boss final).",
+    "fraction_temps_mort": {
+      "mini_boss_1": 0.33,
+      "mini_boss_2": 0.66,
+      "boss": 1.0
+    },
+    "minutes_restantes_min_pour_lancer": 5
+  },
+  "profils": {
+    "gratuit_regulier": {
+      "_doc": "Profil de référence : 1 h/jour, 2 sessions, regarde les pubs récompensées.",
+      "sessions": [
+        [
+          8,
+          25
+        ],
+        [
+          20,
+          35
+        ]
+      ],
+      "minutes_annexes_jour": 15,
+      "vitesse_combat": 1.0,
+      "bonus_qualite_choix": 0.0,
+      "pubs_energie_max": 3,
+      "recharges_gemmes_max": 0,
+      "expeditions_par_monture_jour": 2,
+      "rang_pvp": "moyen"
+    },
+    "gros_joueur_gratuit": {
+      "_doc": "2 h/jour en 3 sessions + connexions courtes de récolte, joue bien ses choix, dépense des gemmes en énergie si besoin.",
+      "sessions": [
+        [
+          8,
+          40
+        ],
+        [
+          13,
+          30
+        ],
+        [
+          20,
+          50
+        ]
+      ],
+      "minutes_annexes_jour": 30,
+      "vitesse_combat": 1.0,
+      "bonus_qualite_choix": 0.03,
+      "pubs_energie_max": 5,
+      "recharges_gemmes_max": 2,
+      "expeditions_par_monture_jour": 3,
+      "rang_pvp": "bon"
+    },
+    "abonne_1h": {
+      "_doc": "Même temps de jeu que le gratuit régulier, combats x2 plus rapides.",
+      "sessions": [
+        [
+          8,
+          25
+        ],
+        [
+          20,
+          35
+        ]
+      ],
+      "minutes_annexes_jour": 15,
+      "vitesse_combat": 2.0,
+      "bonus_qualite_choix": 0.0,
+      "pubs_energie_max": 3,
+      "recharges_gemmes_max": 1,
+      "expeditions_par_monture_jour": 2,
+      "rang_pvp": "moyen"
+    },
+    "abonne_2h": {
+      "_doc": "Gros joueur abonné : 2 h/jour, combats x2.",
+      "sessions": [
+        [
+          8,
+          40
+        ],
+        [
+          13,
+          30
+        ],
+        [
+          20,
+          50
+        ]
+      ],
+      "minutes_annexes_jour": 30,
+      "vitesse_combat": 2.0,
+      "bonus_qualite_choix": 0.03,
+      "pubs_energie_max": 5,
+      "recharges_gemmes_max": 3,
+      "expeditions_par_monture_jour": 3,
+      "rang_pvp": "bon"
+    },
+    "occasionnel_30min": {
+      "_doc": "Profil de contrôle : 30 min/jour en une session, sans pub d'énergie.",
+      "sessions": [
+        [
+          19,
+          30
+        ]
+      ],
+      "minutes_annexes_jour": 12,
+      "vitesse_combat": 1.0,
+      "bonus_qualite_choix": -0.03,
+      "pubs_energie_max": 0,
+      "recharges_gemmes_max": 0,
+      "expeditions_par_monture_jour": 1,
+      "rang_pvp": "faible"
+    }
+  },
+  "_doc_annexes": "Les minutes annexes (défis quotidiens, arène des familiers, PvP, Marée haute, événement de la semaine, récif, expéditions) sont retirées du temps de jeu avant les parties. Pour un abonné, elles sont réduites de 20 % (combats plus rapides).",
+  "reduction_annexes_abonne": 0.2
+}

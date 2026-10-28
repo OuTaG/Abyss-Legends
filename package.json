@@ -1,0 +1,33 @@
+{
+  "name": "abyss-legends",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Abyss Legends - prototype jouable (vertical slice) : un niveau complet du monde 1",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "calibrer": "tsx scripts/calibrer.ts",
+    "cap:sync": "npm run build && cap sync",
+    "cap:ios": "npm run build && cap add ios && cap sync ios && cap open ios",
+    "cap:android": "npm run build && cap add android && cap sync android && cap open android"
+  },
+  "dependencies": {
+    "@capacitor/core": "^8.5.3",
+    "break_infinity.js": "^2.2.0",
+    "pixi.js": "^8.22.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/ios": "^8.5.3",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "_doc": "Rencontres du Sonar autres que le combat (GDD 5.2), shop (5.5), autel, evenements mysteres. CONTENU PROVISOIRE : prix, gains et probabilites inventes. Effets generiques : pv_pct (part des PV max), pv_actuels_pct, pieces, xp, mutation (offre de 3, rarete min), bonus_temp (stat, valeur, combats), combat (embuscade), pv_max_pct (permanent pour la partie), rien.",
+  "epave": { "pieces": [30, 55], "chance_mutation": 0.5, "rarete_min_mutation": "commune" },
+  "grotte": { "soin_pct": 0.40, "_doc": "Du soin : 40 % des PV max, et fin des poisons." },
+  "autel": {
+    "rarete_min": "rare",
+    "couts": [
+      { "id": "sacrifice", "texte": "Sacrifier 30 % de vos PV actuels", "effets": [{ "type": "pv_actuels_pct", "valeur": -0.30 }] },
+      { "id": "offrande", "texte": "Offrir 80 pièces", "effets": [{ "type": "pieces", "valeur": -80 }], "conditionPieces": 80 },
+      { "id": "malediction", "texte": "Perdre 15 % de PV max pour la partie", "effets": [{ "type": "pv_max_pct", "valeur": -0.15 }] }
+    ]
+  },
+  "mysteres": [
+    { "id": "banc_lanternes", "titre": "Banc de poissons-lanternes", "texte": "Un nuage de lumière bleutée vous entoure. Des pièces brillent dans le sable.",
+      "options": [ { "label": "Ramasser", "issues": [ { "poids": 1, "texte": "Vous ramassez 45 pièces.", "effets": [{ "type": "pieces", "valeur": 45 }] } ] } ] },
+    { "id": "epave_hantee", "titre": "Épave hantée", "texte": "Une carcasse de navire gémit dans le courant.",
+      "options": [
+        { "label": "Fouiller", "issues": [
+          { "poids": 6, "texte": "Un butin ! +80 pièces.", "effets": [{ "type": "pieces", "valeur": 80 }] },
+          { "poids": 4, "texte": "Un piège ! -20 % PV.", "effets": [{ "type": "pv_pct", "valeur": -0.20 }] } ] },
+        { "label": "Passer son chemin", "issues": [ { "poids": 1, "texte": "Vous continuez.", "effets": [] } ] } ] },
+    { "id": "courant_mysterieux", "titre": "Courant mystérieux", "texte": "Un courant tiède vous emporte. Où va-t-il ?",
+      "options": [ { "label": "Se laisser porter", "issues": [
+        { "poids": 1, "texte": "Doux repos : +20 % PV.", "effets": [{ "type": "pv_pct", "valeur": 0.20 }] },
+        { "poids": 1, "texte": "Tourbillon : -10 % PV.", "effets": [{ "type": "pv_pct", "valeur": -0.10 }] } ] } ] },
+    { "id": "sirene", "titre": "Sirène chanteuse", "texte": "Une voix cristalline résonne. Elle promet un don... pour un prix.",
+      "options": [
+        { "label": "Écouter", "issues": [
+          { "poids": 4, "texte": "Elle vous offre un pouvoir.", "effets": [{ "type": "mutation", "rarete_min": "rare" }] },
+          { "poids": 6, "texte": "Chant envoûtant : -15 % PV.", "effets": [{ "type": "pv_pct", "valeur": -0.15 }] } ] },
+        { "label": "Se boucher les oreilles", "issues": [ { "poids": 1, "texte": "Vous méditez : +25 XP.", "effets": [{ "type": "xp", "valeur": 25 }] } ] } ] },
+    { "id": "embuscade", "titre": "Embuscade !", "texte": "Quelque chose bouge dans l'ombre...",
+      "options": [ { "label": "Se battre", "issues": [ { "poids": 1, "texte": "Ils attaquent !", "effets": [{ "type": "combat", "pieces_x": 2 }] } ] } ] },
+    { "id": "poulpe_marchand", "titre": "Poulpe prêteur", "texte": "Un poulpe vous propose un échange louche : 40 pièces contre un pouvoir.",
+      "options": [
+        { "label": "Payer 40 pièces", "coutPieces": 40, "issues": [ { "poids": 1, "texte": "Marché conclu.", "effets": [{ "type": "pieces", "valeur": -40 }, { "type": "mutation", "rarete_min": "commune" }] } ] },
+        { "label": "Refuser", "issues": [ { "poids": 1, "texte": "Le poulpe s'éloigne.", "effets": [] } ] } ] },
+    { "id": "fontaine_perles", "titre": "Fontaine de perles", "texte": "Des perles tournoient dans un geyser sous-marin.",
+      "options": [ { "label": "Plonger dedans", "issues": [
+        { "poids": 1, "texte": "Vous gagnez 30 XP.", "effets": [{ "type": "xp", "valeur": 30 }] },
+        { "poids": 1, "texte": "Un bonus de dégâts pour 3 combats.", "effets": [{ "type": "bonus_temp", "stat": "atkPct", "valeur": 0.2, "combats": 3 }] } ] } ] }
+  ]
+}

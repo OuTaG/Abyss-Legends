@@ -1,0 +1,356 @@
+{
+ "_doc": "Mutations de partie (GDD 5.4). Effets additifs par cle de statistique ; chaque prise s'empile jusqu'a pileMax. Toutes perdues en fin de partie. Les mutations 'element' ne sont proposees qu'aux heros de cet element. CONTENU PROVISOIRE : valeurs inventees, a equilibrer.",
+ "raretes": {
+  "commune": {
+   "poids": 10,
+   "couleur": "#9bd4e8",
+   "pileMax": 5,
+   "nom": "Commune"
+  },
+  "rare": {
+   "poids": 4,
+   "couleur": "#7aa7ff",
+   "pileMax": 3,
+   "nom": "Rare"
+  },
+  "epique": {
+   "poids": 1.2,
+   "couleur": "#c27bff",
+   "pileMax": 2,
+   "nom": "Épique"
+  }
+ },
+ "mutations": [
+  {
+   "id": "lames_affutees",
+   "nom": "Lames affûtées",
+   "rarete": "commune",
+   "description": "+12 % dégâts",
+   "effets": {
+    "atkPct": 0.12
+   }
+  },
+  {
+   "id": "peau_epaisse",
+   "nom": "Peau épaisse",
+   "rarete": "commune",
+   "description": "+12 % PV max",
+   "effets": {
+    "hpPct": 0.12
+   }
+  },
+  {
+   "id": "sonar_precis",
+   "nom": "Sonar précis",
+   "rarete": "commune",
+   "description": "+8 % chance de critique",
+   "effets": {
+    "critChance": 0.08
+   }
+  },
+  {
+   "id": "ruee",
+   "nom": "Ruée",
+   "rarete": "commune",
+   "description": "+10 % vitesse d'attaque",
+   "effets": {
+    "speedPct": 0.1
+   }
+  },
+  {
+   "id": "algues",
+   "nom": "Algues régénérantes",
+   "rarete": "commune",
+   "description": "Régénère 0,4 % PV max par seconde",
+   "effets": {
+    "regen": 0.004
+   }
+  },
+  {
+   "id": "ecailles",
+   "nom": "Écailles",
+   "rarete": "commune",
+   "description": "-6 % dégâts subis",
+   "effets": {
+    "dr": 0.06
+   }
+  },
+  {
+   "id": "banc_fidele",
+   "nom": "Banc fidèle",
+   "rarete": "commune",
+   "description": "+35 % dégâts des pets",
+   "effets": {
+    "petDmg": 0.35
+   }
+  },
+  {
+   "id": "monture_fougueuse",
+   "nom": "Monture fougueuse",
+   "rarete": "commune",
+   "description": "+40 % dégâts de la monture",
+   "effets": {
+    "mountDmg": 0.4
+   }
+  },
+  {
+   "id": "gardiens_exaltes",
+   "nom": "Gardiens exaltés",
+   "rarete": "commune",
+   "description": "+40 % dégâts des gardiens",
+   "effets": {
+    "guardianDmg": 0.4
+   }
+  },
+  {
+   "id": "pillage",
+   "nom": "Pillage",
+   "rarete": "commune",
+   "description": "+30 % de pièces gagnées",
+   "effets": {
+    "coinPct": 0.3
+   }
+  },
+  {
+   "id": "savoir_ancien",
+   "nom": "Savoir ancien",
+   "rarete": "commune",
+   "description": "+20 % d'XP de combat",
+   "effets": {
+    "xpPct": 0.2
+   }
+  },
+  {
+   "id": "sang_chaud",
+   "nom": "Sang chaud",
+   "rarete": "commune",
+   "description": "Vol de vie : 4 % des dégâts",
+   "effets": {
+    "lifesteal": 0.04
+   }
+  },
+  {
+   "id": "epines",
+   "nom": "Épines de corail",
+   "rarete": "commune",
+   "description": "Renvoie 25 % de l'attaque aux assaillants de mêlée",
+   "effets": {
+    "thorns": 0.25
+   }
+  },
+  {
+   "id": "courant_porteur",
+   "nom": "Courant porteur",
+   "rarete": "commune",
+   "description": "+6 % d'esquive",
+   "effets": {
+    "dodge": 0.06
+   }
+  },
+  {
+   "id": "poison_meduse",
+   "nom": "Poison de méduse",
+   "rarete": "rare",
+   "description": "Vos coups empoisonnent (20 % de l'attaque par seconde, 4 s)",
+   "effets": {
+    "poisonOnHit": 0.2
+   }
+  },
+  {
+   "id": "choc_abysses",
+   "nom": "Choc des abysses",
+   "rarete": "rare",
+   "description": "+10 % de chance d'étourdir",
+   "effets": {
+    "stunChance": 0.1
+   }
+  },
+  {
+   "id": "predateur",
+   "nom": "Prédateur",
+   "rarete": "rare",
+   "description": "+50 % de dégâts sur les ennemis sous 30 % de PV",
+   "effets": {
+    "execute": 0.5
+   }
+  },
+  {
+   "id": "appetit",
+   "nom": "Appétit",
+   "rarete": "rare",
+   "description": "Soigne 5 % des PV max à chaque ennemi vaincu",
+   "effets": {
+    "healOnKill": 0.05
+   }
+  },
+  {
+   "id": "bouclier_ecume",
+   "nom": "Bouclier d'écume",
+   "rarete": "rare",
+   "description": "Bouclier de 15 % des PV max au début de chaque combat",
+   "effets": {
+    "shieldStart": 0.15
+   }
+  },
+  {
+   "id": "coup_double",
+   "nom": "Coup double",
+   "rarete": "rare",
+   "description": "+15 % de chance de frapper deux fois",
+   "effets": {
+    "multiHit": 0.15
+   }
+  },
+  {
+   "id": "instinct",
+   "nom": "Instinct du chasseur",
+   "rarete": "rare",
+   "description": "+25 % de dégâts avec l'avantage élémentaire",
+   "effets": {
+    "advDmg": 0.25
+   }
+  },
+  {
+   "id": "echo_assistants",
+   "nom": "Écho des assistants",
+   "rarete": "rare",
+   "description": "Les assistants interviennent 1 tour plus tôt",
+   "effets": {
+    "assistReduce": 1
+   },
+   "pileMax": 1
+  },
+  {
+   "id": "rage",
+   "nom": "Rage",
+   "rarete": "rare",
+   "description": "+5 % de dégâts cumulés par ennemi vaincu (dans le combat)",
+   "effets": {
+    "ramp": 0.05
+   }
+  },
+  {
+   "id": "peau_requin",
+   "nom": "Peau de requin",
+   "rarete": "rare",
+   "description": "-10 % dégâts subis, renvoie 20 %",
+   "effets": {
+    "dr": 0.1,
+    "thorns": 0.2
+   }
+  },
+  {
+   "id": "furie",
+   "nom": "Furie marine",
+   "rarete": "epique",
+   "description": "+30 % dégâts, +15 % vitesse",
+   "effets": {
+    "atkPct": 0.3,
+    "speedPct": 0.15
+   },
+   "pileMax": 2
+  },
+  {
+   "id": "coeur_leviathan",
+   "nom": "Cœur de léviathan",
+   "rarete": "epique",
+   "description": "+35 % PV max, régénération 0,6 %/s",
+   "effets": {
+    "hpPct": 0.35,
+    "regen": 0.006
+   },
+   "pileMax": 2
+  },
+  {
+   "id": "maitre_elements",
+   "nom": "Maître des éléments",
+   "rarete": "epique",
+   "description": "+50 % avantage élémentaire, +10 % critique, +30 % dégâts critiques",
+   "effets": {
+    "advDmg": 0.5,
+    "critChance": 0.1,
+    "critMult": 0.3
+   },
+   "pileMax": 2
+  },
+  {
+   "id": "tempete_crustaces",
+   "nom": "Tempête de crustacés",
+   "rarete": "epique",
+   "description": "+100 % pets, +80 % monture et gardiens",
+   "effets": {
+    "petDmg": 1.0,
+    "mountDmg": 0.8,
+    "guardianDmg": 0.8
+   },
+   "pileMax": 2
+  },
+  {
+   "id": "pacte_anciens",
+   "nom": "Pacte des Anciens",
+   "rarete": "epique",
+   "description": "+50 % dégâts, -20 % PV max",
+   "effets": {
+    "atkPct": 0.5,
+    "hpPct": -0.2
+   },
+   "pileMax": 2
+  },
+  {
+   "id": "remous",
+   "nom": "Remous",
+   "rarete": "rare",
+   "description": "Courant : +20 % de coup double, +8 % vitesse",
+   "effets": {
+    "multiHit": 0.2,
+    "speedPct": 0.08
+   },
+   "element": "Courant"
+  },
+  {
+   "id": "nuage_encre",
+   "nom": "Nuage d'encre",
+   "rarete": "rare",
+   "description": "Encre : +12 % d'esquive, poison léger",
+   "effets": {
+    "dodge": 0.12,
+    "poisonOnHit": 0.1
+   },
+   "element": "Encre"
+  },
+  {
+   "id": "prisme",
+   "nom": "Prisme",
+   "rarete": "rare",
+   "description": "Lumen : +12 % critique, +40 % dégâts critiques",
+   "effets": {
+    "critChance": 0.12,
+    "critMult": 0.4
+   },
+   "element": "Lumen"
+  },
+  {
+   "id": "marteau_fosses",
+   "nom": "Marteau des fosses",
+   "rarete": "rare",
+   "description": "Pression : +10 % d'étourdissement, +15 % dégâts",
+   "effets": {
+    "stunChance": 0.1,
+    "atkPct": 0.15
+   },
+   "element": "Pression"
+  },
+  {
+   "id": "recif_vivant",
+   "nom": "Récif vivant",
+   "rarete": "rare",
+   "description": "Corail : -8 % dégâts subis, régénération, épines",
+   "effets": {
+    "dr": 0.08,
+    "regen": 0.004,
+    "thorns": 0.3
+   },
+   "element": "Corail"
+  }
+ ]
+}

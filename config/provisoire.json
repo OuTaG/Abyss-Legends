@@ -1,0 +1,99 @@
+{
+  "_doc": "VALEURS PROVISOIRES inventees pour le prototype : tout ce que config/balance/ (copie de /home/user/balance/config/) ne fournit pas pour le combat. Isolees ici pour etre remplacees par l'equilibrage. Voir RAPPORT du prototype pour la liste commentee.",
+  "puissance_joueur": {
+    "_doc": "Le modele d'equilibrage est une 'puissance' unique. Pour jouer il faut des PV et des degats : stat = coefficient x racine(puissance), de sorte que PV x degats = proportionnel a la puissance. La puissance d'un joueur calibre pour le niveau L vaut D(L) x ratio x fraction_depart x croissance^(niveau_partie-1) x mutations.",
+    "ratios": {
+      "facile": 1.25,
+      "calibre": 1.0,
+      "dur": 0.85
+    },
+    "ratio_defaut": "calibre",
+    "fraction_depart": 0.4,
+    "croissance_par_niveau_de_partie": 1.08,
+    "courbe_attendue": [
+      [
+        1,
+        0.4
+      ],
+      [
+        10,
+        0.62
+      ],
+      [
+        20,
+        0.84
+      ],
+      [
+        30,
+        1.0
+      ]
+    ],
+    "_doc_courbe": "Puissance attendue du joueur au fil des 30 choix (fraction de D(L)). Les multiplicateurs ennemis de difficulte_niveaux.json (0,55 / 0,72 / 0,88 / 1,0) s'appliquent a cette puissance attendue (cf. 'relatifs a la puissance attendue du joueur au moment du combat')."
+  },
+  "heros": {
+    "atk": 3.0,
+    "pv": 30.0,
+    "intervalle_s": 1.0,
+    "crit_base": 0.05,
+    "crit_mult_base": 1.5,
+    "pv_regen_niveau_partie": 0.0
+  },
+  "ennemis": {
+    "pv_par_unite": 130.0,
+    "dps_par_unite": 1.3,
+    "unites_pv": {
+      "normal": 3,
+      "miniboss": 4,
+      "boss": 8
+    },
+    "unites_dps": {
+      "normal": 1.0,
+      "miniboss": 1.3,
+      "boss": 1.35
+    },
+    "intervalle_boss_s": 1.8,
+    "intervalle_miniboss_s": 1.9,
+    "enrage_global_apres_s": 150,
+    "enrage_global_par_30s": 1.0,
+    "renfort_part_pv": 0.15,
+    "tir_vitesse_projectile": 520
+  },
+  "combat": {
+    "pas_s": 0.05,
+    "degat_min_relatif": 0.0,
+    "vitesse_max_rattrapage_s": 0.5,
+    "etourdissement_s": 1.2,
+    "etourdissement_boss_x": 0.4,
+    "poison_duree_s": 4,
+    "avantage_x": 1.2,
+    "desavantage_x": 0.85,
+    "_doc_elements": "x1,2 / x0,85 viennent de config/balance/heros.json (elements.avantage/desavantage) ; ces deux valeurs ne sont qu'un repli."
+  },
+  "pieces": {
+    "depart": 20,
+    "combat_normal": 22,
+    "miniboss": 45,
+    "boss": 0
+  },
+  "tirage_sonar": {
+    "poids_echos": {
+      "combat": 40,
+      "epave": 18,
+      "grotte": 14,
+      "marchand": 12,
+      "autel": 8,
+      "mystere": 12
+    },
+    "max_par_partie": {
+      "marchand": 2,
+      "autel": 2,
+      "grotte": 3,
+      "mystere": 4,
+      "epave": 5
+    },
+    "combats_normaux_max": 5,
+    "combat_min_par_tiers": 1,
+    "echos_boss_miniboss": 3,
+    "_doc": "Garantit 6 a 8 combats par niveau (GDD 5.1) : 3 a 5 combats normaux + 2 mini-boss + boss."
+  }
+}

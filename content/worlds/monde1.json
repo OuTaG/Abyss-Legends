@@ -1,0 +1,32 @@
+{
+  "_doc": "Monde 1 : Lagon (GDD 4.2 a 4.4). Ajouter un monde = ajouter un fichier content/worlds/mondeN.json de ce format. Boss : GDD 4.3 (ordre de rotation). Mini-boss et formes : CONTENU PROVISOIRE (le GDD ne les definit pas).",
+  "id": 1,
+  "nom": "Lagon",
+  "niveaux": 80,
+  "palette": { "fondHaut": "#0d6b8a", "fondBas": "#06243f", "rayons": "#8fe9ff", "accent": "#5fe0c8" },
+  "boss": [
+    { "id": "barracuda", "nom": "Barracuda", "element": "Courant", "forme": "poisson_long" },
+    { "id": "murene_geante", "nom": "Murène géante", "element": "Encre", "forme": "anguille" },
+    { "id": "poisson_pierre", "nom": "Poisson-pierre", "element": "Corail", "forme": "blob" },
+    { "id": "pelagie", "nom": "Pélagie (méduse noctiluque)", "element": "Lumen", "forme": "meduse" },
+    { "id": "requin_tigre", "nom": "Requin-tigre", "element": "Courant", "forme": "requin" },
+    { "id": "crocodile_marin", "nom": "Crocodile marin", "element": "Corail", "forme": "croco" },
+    { "id": "requin_bouledogue", "nom": "Requin-bouledogue", "element": "Pression", "forme": "requin" },
+    { "id": "grand_requin_blanc", "nom": "Grand requin blanc", "element": "Pression", "forme": "requin" }
+  ],
+  "miniboss": [
+    { "id": "requin_nourrice", "nom": "Requin-nourrice", "element": "Pression", "forme": "requin" },
+    { "id": "poisson_lion", "nom": "Poisson-lion", "element": "Lumen", "forme": "poisson_long" },
+    { "id": "merou_geant", "nom": "Mérou géant", "element": "Corail", "forme": "blob" },
+    { "id": "carangue_geante", "nom": "Carangue géante", "element": "Courant", "forme": "poisson_long" },
+    { "id": "pieuvre_anneaux", "nom": "Pieuvre à anneaux bleus", "element": "Encre", "forme": "meduse" }
+  ],
+  "familles": {
+    "essaim":   { "nom": "Poissons-chirurgiens", "element": "Courant" },
+    "cuirasse": { "nom": "Crabe nageur",         "element": "Corail" },
+    "piqueur":  { "nom": "Méduse urticante",     "element": "Lumen" },
+    "chargeur": { "nom": "Raie pastenague",      "element": "Pression" },
+    "embusque": { "nom": "Congre",               "element": "Encre" },
+    "tireur":   { "nom": "Crevette-pistolet",    "element": "Courant" }
+  }
+}

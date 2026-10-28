@@ -1,0 +1,30 @@
+{
+  "_doc": "Monde 2 : Haute mer (GDD 4.2 a 4.4). Present pour prouver l'architecture pilotee par les donnees : aucun code ne mentionne ce monde. Mini-boss et formes : CONTENU PROVISOIRE.",
+  "id": 2,
+  "nom": "Haute mer",
+  "niveaux": 80,
+  "palette": { "fondHaut": "#1a4fa0", "fondBas": "#081a3f", "rayons": "#a8d4ff", "accent": "#7fb8ff" },
+  "boss": [
+    { "id": "requin_mako", "nom": "Requin mako", "element": "Courant", "forme": "requin" },
+    { "id": "physalie", "nom": "Physalie", "element": "Courant", "forme": "meduse" },
+    { "id": "poisson_globe", "nom": "Poisson-globe océanique", "element": "Corail", "forme": "blob" },
+    { "id": "requin_marteau", "nom": "Requin-marteau", "element": "Pression", "forme": "requin" },
+    { "id": "calmar_humboldt", "nom": "Calmar de Humboldt", "element": "Lumen", "forme": "meduse" },
+    { "id": "requin_oceanique", "nom": "Requin océanique", "element": "Pression", "forme": "requin" },
+    { "id": "orque", "nom": "Orque", "element": "Pression", "forme": "requin" },
+    { "id": "kraken", "nom": "Kraken", "element": "Encre", "forme": "meduse" }
+  ],
+  "miniboss": [
+    { "id": "narval", "nom": "Narval", "element": "Courant", "forme": "poisson_long" },
+    { "id": "espadon", "nom": "Espadon", "element": "Lumen", "forme": "poisson_long" },
+    { "id": "thon_rouge", "nom": "Thon rouge géant", "element": "Pression", "forme": "poisson_long" }
+  ],
+  "familles": {
+    "essaim":   { "nom": "Thons en chasse",      "element": "Courant" },
+    "cuirasse": { "nom": "Crabe des sargasses",  "element": "Corail" },
+    "piqueur":  { "nom": "Méduse pélagique",     "element": "Encre" },
+    "chargeur": { "nom": "Raie manta",           "element": "Courant" },
+    "embusque": { "nom": "Anguille pélagique",   "element": "Lumen" },
+    "tireur":   { "nom": "Crevette des courants","element": "Pression" }
+  }
+}

@@ -1,0 +1,174 @@
+{
+  "_doc": "Sources de ressources. Les récompenses en or, XP de héros et nourriture sont multipliées par echelle^(L-1) où L est le niveau joué (ou le niveau max réussi pour les balayages et le hors-ligne). Récompense d'une tentative = valeur_victoire x (0,2 + 0,8 x part_de_la_partie_jouée).",
+  "echelle_recompense_par_niveau": 1.1,
+  "victoire": {
+    "or": 100,
+    "xp_heros": 60,
+    "nourriture": 15,
+    "ressource_permanente": 3,
+    "ressource_monde": 10
+  },
+  "defis_quotidiens": {
+    "deblocage_niveau": 5,
+    "tickets_par_type": 2,
+    "_doc": "Chaque ticket balaye un niveau terminé et rapporte 2 victoires de la ressource du défi (au niveau max réussi).",
+    "victoires_par_ticket": 2,
+    "types": [
+      "or",
+      "xp_heros",
+      "nourriture",
+      "ressource_monde"
+    ],
+    "ressource_monde_par_ticket": 20
+  },
+  "quetes": {
+    "quotidiennes": {
+      "gemmes": 60,
+      "ressource_permanente": 10,
+      "cles": {
+        "laiton": 1
+      }
+    },
+    "hebdomadaires": {
+      "gemmes": 300,
+      "ressource_permanente": 60,
+      "cles": {
+        "or": 2
+      }
+    }
+  },
+  "arene_familiers": {
+    "deblocage_niveau": 8,
+    "nourriture_victoires": 2,
+    "fragments_gardien": 3
+  },
+  "maree_haute": {
+    "deblocage_niveau": 15,
+    "or_victoires": 10,
+    "fragments_gardien": 10,
+    "ressource_permanente": 40,
+    "coeurs_par_rang": {
+      "faible": 1,
+      "moyen": 2,
+      "bon": 3
+    },
+    "_doc": "Récompenses de fin de semaine par paliers de dégâts + classement. Les dégâts suivent la puissance du joueur : clés de nacre des paliers de dégâts = 0,45 x (niveau max atteint - 20) x facteur de rang, sans plafond (63 par semaine au niveau 160 pour un rang moyen). Clés fixes : 5 clés d'or. Le Cœur abyssal ne vient que du classement.",
+    "cles_fixes": {
+      "or": 5
+    },
+    "cles_nacre_par_niveau_atteint": 0.45,
+    "facteur_rang": {
+      "faible": 0.6,
+      "moyen": 1.0,
+      "bon": 1.4
+    },
+    "a_partir_du_niveau": 20
+  },
+  "pvp": {
+    "deblocage_niveau": 10,
+    "monnaie_ligue_par_rang": {
+      "faible": 350,
+      "moyen": 500,
+      "bon": 650
+    },
+    "boutique": {
+      "fragments_heros_epique": {
+        "quantite": 10,
+        "prix": 200,
+        "max_semaine": 2
+      },
+      "fragments_heros_legendaire": {
+        "quantite": 5,
+        "prix": 150,
+        "max_semaine": 1
+      },
+      "coeur_abyssal": {
+        "quantite": 1,
+        "prix": 100,
+        "max_semaine": 3
+      },
+      "cle_nacre": {
+        "quantite": 1,
+        "prix": 40,
+        "max_semaine": 5
+      }
+    },
+    "_doc_priorite": "Ordre d'achat simulé : fragments du héros visé, puis Cœurs abyssaux, puis clés de nacre."
+  },
+  "coeurs_fin_de_monde": {
+    "monde_1": 15,
+    "monde_2": 25,
+    "_doc": "Donnés à la première victoire du niveau 80 de chaque monde (boss de fin de monde)."
+  },
+  "deblocages": {
+    "pets": 3,
+    "arbre_monde": 2,
+    "arbre_permanent": 6,
+    "defis_quotidiens": 5,
+    "arene": 8,
+    "pvp": 10,
+    "evenements": 10,
+    "expeditions": 12,
+    "maree_haute": 15
+  },
+  "missions_premiere_semaine": {
+    "_doc": "Missions-tutoriel à finir avant la fin du 7e jour (GDD 12), accessibles à 30 min/jour. Modèle : réussies si le joueur a atteint le niveau indiqué et joué chaque jour (les autres missions - ouvrir un coffre, monter un emplacement, lancer une expédition… - sont faites en suivant le bouton « Accéder »).",
+    "niveau_requis": 10,
+    "fragments_heros_epique": 10
+  },
+  "premiere_victoire": {
+    "or_victoires_bonus": 2,
+    "gemmes": 15,
+    "ressource_permanente": 8,
+    "ressource_monde": 25,
+    "_doc": "En plus des 4 clés de première fois (tirages.json)."
+  },
+  "packs_or": {
+    "_doc": "3 packs d'or en boutique contre des gemmes (GDD 12). L'or donné vaut un nombre de victoires d'or au niveau max atteint, pour rester utile à tous les stades (pas de plafond).",
+    "petit": {
+      "gemmes": 80,
+      "victoires_or": 3
+    },
+    "moyen": {
+      "gemmes": 300,
+      "victoires_or": 14
+    },
+    "grand": {
+      "gemmes": 900,
+      "victoires_or": 50
+    },
+    "_doc_rentabilite": "Victoires d'or par 100 gemmes : petit 3,75 ; moyen 4,67 (+24 %) ; grand 5,56 (+48 %)."
+  },
+  "materiaux_amelioration": {
+    "_doc": "Matériaux d'amélioration d'équipement (ressource existante du GDD) : matériau commun proposé pour S/SS. Ils sont consommés par CHAQUE fusion (montée de rang, montée de rareté) de toutes les pièces, et par le passage à S/SS : le joueur doit choisir entre monter ses autres pièces maintenant ou économiser pour S. Revenus non indexés sur le niveau (stock lisible).",
+    "par_tentative": 6,
+    "premiere_victoire": 20,
+    "defi_quotidien": 60,
+    "hors_ligne_par_h": 2,
+    "evenement_par_semaine": 250,
+    "maree_haute_par_semaine": 150,
+    "cout_rang_par_rarete": [
+      2,
+      5,
+      10,
+      30,
+      100,
+      250,
+      400,
+      800
+    ],
+    "cout_montee_rarete_par_rarete": [
+      10,
+      25,
+      50,
+      150,
+      500
+    ],
+    "cout_S": 3000,
+    "cout_SS": 12000,
+    "_doc_couts": "Indice = rareté actuelle de l'objet (0 Commun … 5 Mythique, 6 S, 7 SS)."
+  },
+  "politique_gemmes": "nacre",
+  "politique_materiaux": "reserve_S",
+  "_doc_politiques": "Comportement du joueur simulé. politique_gemmes : 'nacre' (gemmes libres -> coffres de nacre) ou 'packs_or' (-> grand pack d'or). politique_materiaux : 'reserve_S' (dès que l'arme est Mythique r5 ou S5, il garde les matériaux du passage suivant) ou 'immediat' (il dépense tout de suite)."
+}

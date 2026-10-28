@@ -1,0 +1,22 @@
+{
+  "_doc": "Énergie. Une tentative de niveau coûte 10. La régénération naturelle s'arrête au plafond ; la recharge quotidienne remonte au plafond ; pubs, gemmes et récompenses peuvent dépasser le plafond jusqu'au stock maximum (très haut).",
+  "cout_tentative": 10,
+  "plafond_regeneration": 60,
+  "minutes_par_point": 72,
+  "recharge_quotidienne_jusqu_a": 60,
+  "stock_maximum": 999,
+  "_doc_bilan": "Par jour : recharge quotidienne 60 (6 tentatives) + régénération 20 (2 tentatives) = 8 tentatives sans rien payer. Jusqu'à +5 tentatives par pubs (13 au total), puis recharges en gemmes (+3 tentatives, coût doublé à chaque fois).",
+  "pub": {
+    "energie": 10,
+    "max_par_jour": 5
+  },
+  "gemmes": {
+    "energie": 30,
+    "couts": [
+      80,
+      160,
+      320
+    ],
+    "_doc": "Le coût double à chaque recharge dans la journée."
+  }
+}

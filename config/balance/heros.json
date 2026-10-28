@@ -1,0 +1,105 @@
+{
+  "_doc": "Héros (GDD 6.1). Chaque héros progresse indépendamment : ses étoiles et son niveau lui sont propres. Puissance héros = base_rareté x (1 + 0,08 x étoiles) x 1,025^niveau_du_héros x avantage élémentaire. L'XP de héros est une ressource commune que le joueur répartit : le joueur simulé la dépense là où elle rapporte le plus de puissance moyenne sur les 8 prochains niveaux (selon les éléments des boss). Changer de héros ne pénalise pas l'équipement. Les fragments ne viennent jamais de la boutique classique.",
+  "base_par_rarete": {
+    "Base": 1.0,
+    "Epique": 1.25,
+    "Legendaire": 1.6
+  },
+  "bonus_etoile": 0.08,
+  "etoiles_max_v1": 5,
+  "couts_etoiles": {
+    "Epique": [
+      20,
+      30,
+      50,
+      80,
+      120
+    ],
+    "Legendaire": [
+      30,
+      45,
+      75,
+      120,
+      180
+    ]
+  },
+  "fragments_deblocage": {
+    "Epique": 50,
+    "Legendaire": 100
+  },
+  "heros": [
+    {
+      "nom": "Plongeur",
+      "rarete": "Base",
+      "element": null
+    },
+    {
+      "nom": "Epique Lumen",
+      "rarete": "Epique",
+      "element": "Lumen"
+    },
+    {
+      "nom": "Epique Corail",
+      "rarete": "Epique",
+      "element": "Corail"
+    },
+    {
+      "nom": "Epique Courant",
+      "rarete": "Epique",
+      "element": "Courant"
+    },
+    {
+      "nom": "Epique Pression",
+      "rarete": "Epique",
+      "element": "Pression"
+    },
+    {
+      "nom": "Epique Encre",
+      "rarete": "Epique",
+      "element": "Encre"
+    },
+    {
+      "nom": "Legendaire Corail",
+      "rarete": "Legendaire",
+      "element": "Corail"
+    },
+    {
+      "nom": "Legendaire Lumen",
+      "rarete": "Legendaire",
+      "element": "Lumen"
+    },
+    {
+      "nom": "Legendaire Pression",
+      "rarete": "Legendaire",
+      "element": "Pression"
+    },
+    {
+      "nom": "Legendaire Courant",
+      "rarete": "Legendaire",
+      "element": "Courant"
+    },
+    {
+      "nom": "Legendaire Encre",
+      "rarete": "Legendaire",
+      "element": "Encre"
+    }
+  ],
+  "_doc_ordre": "Ordre de déblocage supposé (le joueur choisit les fragments à viser en boutique de ligue) : l'élément qui bat le plus de boss d'abord.",
+  "elements": {
+    "fort_contre": {
+      "Courant": "Encre",
+      "Encre": "Lumen",
+      "Lumen": "Pression",
+      "Pression": "Corail",
+      "Corail": "Courant"
+    },
+    "avantage": 1.2,
+    "desavantage": 0.85
+  },
+  "niveau_heros": {
+    "multiplicateur_par_niveau": 1.025,
+    "cout_xp_base": 50,
+    "croissance_cout": 1.09,
+    "_doc": "XP de héros pour passer le niveau n à n+1 d'UN héros = 50 x 1,09^n ; chaque niveau x1,025. Pas de niveau maximum."
+  }
+}

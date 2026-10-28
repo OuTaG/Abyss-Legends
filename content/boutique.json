@@ -1,0 +1,14 @@
+{
+  "_doc": "Shop du niveau (GDD 5.5) : pieces de partie, ameliorations temporaires (soins, mutations, bonus). CONTENU PROVISOIRE (prix inventes). 'stock' = nombre d'articles tires par visite de la partie (le meme shop est conserve si le joueur revient).",
+  "stock": 5,
+  "articles": [
+    { "id": "potion_petite", "garanti": true, "nom": "Potion d'écume", "description": "Soigne 30 % des PV max", "prix": 30, "poids": 4, "max": 2, "effet": { "type": "pv_pct", "valeur": 0.30 } },
+    { "id": "potion_grande", "nom": "Élixir de nacre", "description": "Soigne 70 % des PV max", "prix": 65, "poids": 2, "max": 1, "effet": { "type": "pv_pct", "valeur": 0.70 } },
+    { "id": "mutation_choix", "nom": "Mutation au choix", "description": "Choisissez 1 mutation parmi 3", "prix": 70, "poids": 4, "max": 2, "effet": { "type": "mutation", "rarete_min": "commune" } },
+    { "id": "mutation_rare", "nom": "Mutation rare", "description": "1 parmi 3 mutations rares ou mieux", "prix": 130, "poids": 2, "max": 1, "effet": { "type": "mutation", "rarete_min": "rare" } },
+    { "id": "tonique_force", "nom": "Tonique de force", "description": "+20 % de dégâts pendant 3 combats", "prix": 45, "poids": 3, "max": 1, "effet": { "type": "bonus_temp", "stat": "atkPct", "valeur": 0.2, "combats": 3 } },
+    { "id": "carapace", "nom": "Carapace d'appoint", "description": "-15 % dégâts subis pendant 3 combats", "prix": 45, "poids": 3, "max": 1, "effet": { "type": "bonus_temp", "stat": "dr", "valeur": 0.15, "combats": 3 } },
+    { "id": "parchemin_xp", "nom": "Parchemin d'expérience", "description": "+40 XP de partie", "prix": 55, "poids": 3, "max": 1, "effet": { "type": "xp", "valeur": 40 } },
+    { "id": "coeur_de_corail", "nom": "Cœur de corail", "description": "+10 % PV max pour la partie (et soigne autant)", "prix": 60, "poids": 2, "max": 1, "effet": { "type": "pv_max_pct", "valeur": 0.10 } }
+  ]
+}

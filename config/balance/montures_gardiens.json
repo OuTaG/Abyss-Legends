@@ -1,0 +1,30 @@
+{
+  "_doc": "Montures (12 en V1) et Gardiens des abysses (8 en V1). Fragments ciblés : on suppose que le joueur choisit les quêtes d'expédition et les récompenses qui donnent les fragments de la monture/du gardien qu'il vise.",
+  "montures": {
+    "_doc_puissance": "Contribution = 1 + 0,10 x puissance_monture_active ; puissance_monture = base_rareté x (1 + 0,30 x étoiles).",
+    "coefficient": 0.10,
+    "base_par_rarete": {"Original": 1.0, "Rare": 1.4, "Epique": 2.0, "Legendaire": 3.0},
+    "bonus_etoile": 0.30,
+    "liste_raretes": ["Original", "Original", "Rare", "Rare", "Rare", "Epique", "Epique", "Epique", "Epique", "Legendaire", "Legendaire", "Legendaire"],
+    "monture_offerte_niveau": 5,
+    "fragments_deblocage": {"Original": 20, "Rare": 40, "Epique": 80, "Legendaire": 150},
+    "couts_etoiles": [20, 30, 50, 80, 120],
+    "facteur_cout_etoiles": {"Original": 0.7, "Rare": 1.0, "Epique": 1.5, "Legendaire": 2.0},
+    "expeditions": {
+      "deblocage_niveau": 12,
+      "fragments_par_expedition": 2,
+      "montures_en_expedition_max": 6,
+      "huitres_par_expedition": 0.1,
+      "_doc": "Expéditions de 1 h à 12 h ; le nombre d'expéditions par monture et par jour dépend du profil (nombre de connexions)."
+    }
+  },
+  "gardiens": {
+    "_doc_puissance": "Contribution = 1 + somme sur TOUS les gardiens possédés de passif_rareté x (1 + 0,25 x étoiles). Les 2 gardiens actifs (attaques) sont inclus dans ce passif (modèle agrégé).",
+    "liste_raretes": ["Commun", "Original", "Rare", "Rare", "Epique", "Epique", "Legendaire", "Mythique"],
+    "passif_par_rarete": {"Commun": 0.02, "Original": 0.03, "Rare": 0.04, "Epique": 0.06, "Legendaire": 0.09, "Mythique": 0.13},
+    "bonus_etoile": 0.25,
+    "fragments_deblocage": {"Commun": 20, "Original": 30, "Rare": 50, "Epique": 80, "Legendaire": 120, "Mythique": 200},
+    "couts_etoiles": [10, 20, 30, 50, 80],
+    "facteur_cout_etoiles": {"Commun": 0.6, "Original": 0.8, "Rare": 1.0, "Epique": 1.4, "Legendaire": 2.0, "Mythique": 2.5}
+  }
+}

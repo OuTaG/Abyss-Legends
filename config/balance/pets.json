@@ -1,0 +1,11 @@
+{
+  "_doc": "Pets : 3 actifs. Raretés et rangs comme les armes (même règle de fusion, jusqu'à Mythique, pas de S/SS). Niveaux achetés avec la nourriture : coût du niveau n -> n+1 = 15 x 1,10^n. Puissance d'un emplacement de pet = 1,7^(cran/5) x 1,03^niveau. Contribution à la puissance du joueur = (1 + somme_des_3_pets / 3)^0,5. Le niveau est porté par l'emplacement de pet (simplification : changer de pet ne fait pas perdre l'investissement).",
+  "emplacements": 3,
+  "elasticite": 0.5,
+  "multiplicateur_par_niveau": 1.03,
+  "cout_nourriture_base": 15,
+  "croissance_cout": 1.1,
+  "deblocage_niveau": 3,
+  "pet_depart": "Commun",
+  "nombre_pets_v1": 30
+}

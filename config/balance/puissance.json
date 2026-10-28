@@ -1,0 +1,10 @@
+{
+  "_doc": "Modèle agrégé de puissance. Puissance = 100 x Equipement x Niveau_héros x Héros x Pets x Monture x Gardiens x Perles x Arbre_permanent x Arbres_de_monde x Bonus_XP_partie. Chaque facteur vaut ~1 au départ. Equipement = moyenne pondérée des emplacements (arme 40 %, autres 12 %) de 1,7^(cran/5) x multiplicateur S/SS x 1,03^niveau_emplacement. L'avantage élémentaire (x1,20 / x0,85) s'applique au boss selon le meilleur héros possédé.",
+  "puissance_depart": 100,
+  "_doc_hypotheses": [
+    "Les stats d'attaque et de vie sont résumées en un seul nombre (puissance).",
+    "Les bonus d'un même système s'additionnent, les systèmes se multiplient entre eux.",
+    "Les pets, la monture et les gardiens ont une contribution moins que proportionnelle (élasticité ou coefficient).",
+    "La classe (élément) des équipements ne pénalise pas le changement de héros."
+  ]
+}

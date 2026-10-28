@@ -1,0 +1,112 @@
+{
+  "_doc": "Puissance recommandée D(L) pour réussir le niveau L (L global : 1-80 = monde 1, 81-160 = monde 2). Formule : D(L) = D(L-1) x g_cycle x pas_normalise[(L-1) mod 8]. Un cycle = 8 niveaux = un tour des 8 boss ; chaque monde a 10 cycles, chacun avec sa croissance g_cycle (exponentielle par morceaux). Sur un cycle, le produit des pas vaut exactement g_cycle^8. Les g_cycle sont produits par sim/calibrer.py à partir du rythme cible ci-dessous.",
+  "puissance_niveau_1": 60,
+  "croissance_monde_suivant_par_defaut": 1.1,
+  "pas_cycle_8_bruts": [
+    1.05,
+    1.06,
+    1.08,
+    1.11,
+    1.05,
+    1.07,
+    1.09,
+    1.19
+  ],
+  "_doc_pas": "Valeurs brutes ; elles sont normalisées (divisées par leur moyenne géométrique) puis multipliées par g_monde. Position 1 = boss n°1 de la rotation, position 8 = boss n°8 (boss de fin de cycle, et boss final au niveau 80).",
+  "seuils_controles": {
+    "mini_boss_1": 0.85,
+    "mini_boss_2": 0.93,
+    "boss": 1.0
+  },
+  "_doc_seuils": "Le joueur passe un contrôle si puissance x avantage_elementaire x qualite_de_partie >= seuil x D(L).",
+  "sigma_qualite_partie": 0.12,
+  "sigma_controle": 0.04,
+  "_doc_sigma": "Qualité de partie = exp(N(bonus_profil, sigma_qualite_partie)) : représente la qualité des choix de Sonar, mutations et shop (environ +/-12 % de puissance effective). sigma_controle = aléa propre à chaque combat clé.",
+  "ennemis_pour_developpeurs": {
+    "_doc": "Stats des ennemis = stats_reference(L) x multiplicateur. stats_reference(L) = D(L)/D(1) x stats d'un ennemi normal du niveau 1. Les multiplicateurs sont relatifs à la puissance attendue du joueur au moment du combat (XP de partie et mutations comprises).",
+    "niveau_ennemi_1_choix_1_a_9": 0.55,
+    "mini_boss_choix_10": 0.85,
+    "niveau_ennemi_2_choix_11_a_19": 0.72,
+    "mini_boss_choix_20": 0.93,
+    "niveau_ennemi_3_choix_21_a_30": 0.88,
+    "boss_final": 1.0,
+    "pv_relatifs": {
+      "ennemi": 1,
+      "mini_boss": 4,
+      "boss": 8
+    }
+  },
+  "rythme_cible": {
+    "_doc": "Vitesse visée (niveaux/jour) pour le joueur de référence (gratuit régulier), définie par points [niveau dans le monde, vitesse] et interpolée linéairement ; seule la forme compte, la durée totale (jours) fixe l'échelle. Monde 1 : croisière courte (niveaux 1-10, limitée par le nombre de parties), puis ralentissement net au niveau 11 pour un premier vrai blocage vers les niveaux 12-15 (jours 3-4), remontée à ~2,9 niveaux/jour au milieu du monde, 2,1 à la fin.",
+    "1": {
+      "jours": 28,
+      "points": [
+        [
+          1,
+          4.0
+        ],
+        [
+          10,
+          4.0
+        ],
+        [
+          11,
+          1.7
+        ],
+        [
+          25,
+          2.9
+        ],
+        [
+          50,
+          2.9
+        ],
+        [
+          80,
+          2.1
+        ]
+      ]
+    },
+    "2": {
+      "jours": 42,
+      "points": [
+        [
+          1,
+          2.3
+        ],
+        [
+          80,
+          1.55
+        ]
+      ]
+    },
+    "facteur_monde_suivant": 1.5
+  },
+  "croissance_par_cycle": {
+    "1": [
+      1.1672,
+      1.8101,
+      1.2004,
+      1.1444,
+      1.1358,
+      1.1373,
+      1.1262,
+      1.1338,
+      1.1339,
+      1.1429
+    ],
+    "2": [
+      1.1534,
+      1.1504,
+      1.1321,
+      1.1205,
+      1.1518,
+      1.1183,
+      1.1287,
+      1.1205,
+      1.1073,
+      1.092
+    ]
+  },
+  "_doc_defaut": "Croissance utilisée pour projeter un monde pas encore calibré (grands nombres). Un vrai nouveau monde doit être calibré avec sim/calibrer.py --mondes N."
+}

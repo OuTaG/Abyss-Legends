@@ -2,7 +2,7 @@
 import { D, Decimal, fromSave, toSave } from './num';
 import type { GameData } from '../data/build';
 import { niveauInfo } from './difficulty';
-import type { Milestone } from './run';
+import type { Milestone, SauvegardePartie } from './run';
 
 export const QUALITES_CLES = ['bois', 'fer', 'laiton', 'or', 'nacre'] as const;
 export type QualiteCle = (typeof QUALITES_CLES)[number];
@@ -21,16 +21,19 @@ export interface Profil {
   cles: Record<QualiteCle, number>;
   ressources: { or: string; xpHeros: string; nourriture: string; ressourcePermanente: string; gemmes: number; ressourceMonde: Record<string, string> };
   niveaux: Record<string, ProgresNiveau>;
+  /** Partie en cours, sauvegardee a chaque choix de Sonar (null hors partie). */
+  partieEnCours: SauvegardePartie | null;
 }
 
 export function nouveauProfil(data: GameData, now: number): Profil {
   return {
-    version: 2,
+    version: 3,
     parametres: { abonne: false, preset: data.prov.puissance_joueur.ratio_defaut, heroId: data.herosContent.heros_defaut, niveau: 1, langue: 'auto' },
     energie: { valeur: data.energie.plafond_regeneration, majLe: now },
     cles: { bois: 0, fer: 0, laiton: 0, or: 0, nacre: 0 },
     ressources: { or: '0', xpHeros: '0', nourriture: '0', ressourcePermanente: '0', gemmes: 0, ressourceMonde: {} },
     niveaux: {},
+    partieEnCours: null,
   };
 }
 

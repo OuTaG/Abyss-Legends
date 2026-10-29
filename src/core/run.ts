@@ -33,6 +33,31 @@ export interface Rencontre {
   mutationAutel?: MutationDef;
 }
 
+/** Partie en cours sauvegardee a chaque tour (GDD 4.1) : tout ce qu'il faut pour reprendre exactement au choix de
+ *  Sonar en attente. Le hasard est entierement derive de la graine (Rng.derive), plus le compteur des offres. */
+export interface SauvegardePartie {
+  v: 1;
+  opts: { niveau: number; heroId: string; graine: number; ratio: number };
+  step: number;
+  echos: Echo[];
+  prog: SonarProgress;
+  hp: string;
+  pieces: number;
+  xp: number;
+  niveauHeros: number;
+  mutations: Record<string, number>;
+  temp: { stat: StatKey; valeur: number; combats: number }[];
+  pvMaxBonus: number;
+  shop: { id: string; achete: number }[] | null;
+  nbCombats: number;
+  nbMutations: number;
+  recordStep: number;
+  offreCompteur: number;
+  mysteresVus: string[];
+  /** Echo deja choisi a ce tour (fermeture pendant la rencontre) : rejoue a la reprise, pas de second choix possible. */
+  choix?: number;
+}
+
 export interface Butin { xp: number; pieces: number; niveaux: number; kind: EnemyKind }
 
 interface TempBonus { stat: StatKey; valeur: number; combats: number }
@@ -460,6 +485,45 @@ export class Run {
   quitterShop(): void {
     if (this.phase !== 'shop') return;
     this.advance();
+  }
+
+  // ------------------------------------------------------------ sauvegarde de la partie en cours
+  /** Etat complet au choix de Sonar en attente (seul moment ou la partie est sauvegardee). */
+  sauvegarde(): SauvegardePartie {
+    if (this.phase !== 'sonar') throw new Error('La partie ne se sauvegarde qu\'au choix de Sonar (phase ' + this.phase + ')');
+    const { niveau, heroId, graine, ratio } = this.opts;
+    return JSON.parse(JSON.stringify({
+      v: 1, opts: { niveau, heroId, graine, ratio }, step: this.step, echos: this.echos, prog: this.prog, hp: this.hp.toString(),
+      pieces: this.pieces, xp: this.xp, niveauHeros: this.niveauHeros, mutations: this.mutations, temp: this.temp, pvMaxBonus: this.pvMaxBonus,
+      shop: this.shop ? this.shop.slots.map((sl) => ({ id: sl.article.id, achete: sl.achete })) : null,
+      nbCombats: this.nbCombats, nbMutations: this.nbMutations, recordStep: this.recordStep, offreCompteur: this.offreCompteur, mysteresVus: this.mysteresVus,
+    }));
+  }
+
+  /** Reprend une partie sauvegardee, au choix de Sonar ou elle s'etait arretee. */
+  static restaurer(data: GameData, diff: Difficulty, sv: SauvegardePartie, onMilestone?: (m: Milestone) => void): Run {
+    const r = new Run(data, diff, { ...sv.opts });
+    r.step = sv.step;
+    r.echos = sv.echos;
+    r.prog = sv.prog;
+    r.pieces = sv.pieces;
+    r.xp = sv.xp;
+    r.niveauHeros = sv.niveauHeros;
+    r.mutations = { ...sv.mutations };
+    r.temp = sv.temp.map((x) => ({ ...x }));
+    r.pvMaxBonus = sv.pvMaxBonus;
+    r.shop = sv.shop ? { slots: sv.shop.map((x) => ({ article: data.boutique.articles.find((a) => a.id === x.id)!, achete: x.achete })) } : null;
+    r.nbCombats = sv.nbCombats;
+    r.nbMutations = sv.nbMutations;
+    r.recordStep = sv.recordStep;
+    r.offreCompteur = sv.offreCompteur;
+    r.mysteresVus = [...sv.mysteresVus];
+    r.cache = null;
+    r.hp = D(sv.hp);
+    r.phase = 'sonar';
+    r.opts.onMilestone = onMilestone;
+    if (sv.choix !== undefined) r.chooseEcho(sv.choix); // la rencontre reprend depuis son debut
+    return r;
   }
 
   get fini(): boolean { return this.phase === 'victoire' || this.phase === 'defaite'; }

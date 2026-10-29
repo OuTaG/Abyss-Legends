@@ -88,7 +88,8 @@ describe('sauvegarde versionnee', () => {
   it('migre une ancienne version et complete les champs ajoutes', () => {
     const ancienne = { niveaux: { '1': { record: 12, termine: false, cles: { c10: true, c20: false, fin: false }, tentatives: 2 } } };
     const p = completer(data, migrer(ancienne), 5);
-    expect(p.version).toBe(2);
+    expect(p.version).toBe(3);
+    expect(p.partieEnCours).toBeNull();
     expect(p.parametres.langue).toBe('auto');
     expect(p.niveaux['1'].record).toBe(12);
     expect(p.energie.valeur).toBe(60);

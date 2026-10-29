@@ -1,4 +1,6 @@
-// Le Sonar (GDD 5.2) : 30 choix, 3 echos par etape, mini-boss aux choix 10 et 20, boss au choix 30.
+// Le Sonar (GDD 5.2) : 30 choix, toujours 3 echos (gauche, devant, droite), mini-boss aux choix 10 et 20, boss au choix 30.
+// Incertitude complete : le type d'un echo n'est connu que de la logique ; la vue ne recoit que le nombre d'echos.
+// Aux choix 10, 20 et 30, les 3 echos menent tous au mini-boss / boss (rien ne le montre avant la traversee).
 import type { GameData } from '../data/build';
 import type { EchoType } from './types';
 import { Rng } from './rng';
@@ -6,11 +8,13 @@ import { choisirGroupe, tierDuChoix } from './enemies';
 
 export const NB_CHOIX = 30;
 export const CHOIX_MINIBOSS = [10, 20];
+/** Toujours 3 echos, aux 3 memes emplacements : gauche, devant, droite. */
+export const NB_ECHOS = 3;
 
 export interface Echo {
   type: EchoType;
   seed: number;
-  /** Combat normal : id du groupe d'ennemis (cache au joueur, seule une silhouette floue est montree). */
+  /** Combat normal : id du groupe d'ennemis (jamais montre au joueur avant la traversee). */
   groupe?: string;
   /** Mini-boss : index dans la liste du monde. */
   miniIndex?: number;
@@ -30,10 +34,10 @@ export const progressVide = (): SonarProgress => ({ compteurs: {}, combatsNormau
 export function genererEchos(data: GameData, graine: number, step: number, prog: SonarProgress): Echo[] {
   const rng = Rng.derive(graine, step);
   const cfg = data.prov.tirage_sonar;
-  if (step === NB_CHOIX) return [{ type: 'boss', seed: rng.int(1, 1e9) }];
+  if (step === NB_CHOIX) return Array.from({ length: NB_ECHOS }, () => ({ type: 'boss' as const, seed: rng.int(1, 1e9) }));
   if (CHOIX_MINIBOSS.includes(step)) {
-    // 3 variantes de mini-boss, de la liste du monde (le joueur choisit son adversaire)
-    const n = cfg.echos_boss_miniboss;
+    // 3 variantes de mini-boss de la liste du monde, cachees derriere 3 echos identiques
+    const n = NB_ECHOS;
     const ordre = rng.shuffle(Array.from({ length: n }, (_, i) => i));
     const decalage = step === CHOIX_MINIBOSS[1] ? 2 : 0;
     return ordre.map((i) => ({ type: 'miniboss' as const, seed: rng.int(1, 1e9), miniIndex: i + decalage }));

@@ -2,7 +2,7 @@
 import type { GameData } from '../data/build';
 import { nouveauProfil, type Profil } from './profile';
 
-export const VERSION_SAUVEGARDE = 1;
+export const VERSION_SAUVEGARDE = 2;
 export const CLE_STOCKAGE = 'abyss-legends-save';
 
 export type Migration = (s: any) => any;
@@ -11,6 +11,8 @@ export type Migration = (s: any) => any;
 export const MIGRATIONS: Record<number, Migration> = {
   // 0 -> 1 : anciennes sauvegardes sans numero de version (prototypes tres precoces)
   0: (s) => ({ ...s, version: 1, niveaux: s.niveaux ?? {} }),
+  // 1 -> 2 : choix de la langue (auto = langue de l'appareil)
+  1: (s) => ({ ...s, parametres: { ...(s.parametres ?? {}), langue: s.parametres?.langue ?? 'auto' } }),
 };
 
 export function migrer(brut: any, cible = VERSION_SAUVEGARDE, migrations: Record<number, Migration> = MIGRATIONS): any {

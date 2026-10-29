@@ -16,7 +16,7 @@ export interface ProgresNiveau {
 
 export interface Profil {
   version: number;
-  parametres: { abonne: boolean; preset: string; heroId: string; niveau: number };
+  parametres: { abonne: boolean; preset: string; heroId: string; niveau: number; langue: string };
   energie: { valeur: number; majLe: number };
   cles: Record<QualiteCle, number>;
   ressources: { or: string; xpHeros: string; nourriture: string; ressourcePermanente: string; gemmes: number; ressourceMonde: Record<string, string> };
@@ -25,8 +25,8 @@ export interface Profil {
 
 export function nouveauProfil(data: GameData, now: number): Profil {
   return {
-    version: 1,
-    parametres: { abonne: false, preset: data.prov.puissance_joueur.ratio_defaut, heroId: data.herosContent.heros_defaut, niveau: 1 },
+    version: 2,
+    parametres: { abonne: false, preset: data.prov.puissance_joueur.ratio_defaut, heroId: data.herosContent.heros_defaut, niveau: 1, langue: 'auto' },
     energie: { valeur: data.energie.plafond_regeneration, majLe: now },
     cles: { bois: 0, fer: 0, laiton: 0, or: 0, nacre: 0 },
     ressources: { or: '0', xpHeros: '0', nourriture: '0', ressourcePermanente: '0', gemmes: 0, ressourceMonde: {} },

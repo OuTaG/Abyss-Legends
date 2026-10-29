@@ -22,6 +22,9 @@ export type CombatEvent =
   | { t: 'assistant'; index: number; nom: string }
   | { t: 'multi'; src: number };
 
+/** Seuls le heros et sa monture peuvent etre touches (GDD 5.3) : les pets et gardiens ne sont jamais cibles. */
+export const CIBLES_POSSIBLES: ReadonlyArray<Fighter['kind']> = ['hero', 'mount'];
+
 export interface HeroInit {
   element: Element | null;
   atk: Decimal;
@@ -71,7 +74,9 @@ export class Combat {
   result: CombatResult | null = null;
   events: CombatEvent[] = [];
   hero: Fighter;
-  allies: Fighter[] = []; // mount, pets, gardiens (attaquants sans PV)
+  /** Monture : attaque et peut etre touchee (PV propres). Mise hors de combat, elle n'attaque plus. */
+  mount!: Fighter;
+  allies: Fighter[] = []; // monture, pets, gardiens (pets et gardiens sans PV : jamais cibles)
   enemies: Fighter[] = [];
   shield: Decimal = ZERO;
   heroTurns = 0;
@@ -105,6 +110,9 @@ export class Combat {
     const mk2 = (nom: string, kind: Fighter['kind'], element: Element | null, intervalle: number, part: number, i: number) =>
       this.allies.push(mk({ uid: this.nextUid++, side: 'ally', kind, nom, element, intervalle, partDegats: part, cd: intervalle * (0.3 + 0.2 * i), index: i }));
     mk2(hc.monture.nom, 'mount', hc.monture.element, hc.monture.intervalle, hc.monture.part_degats, 0);
+    this.mount = this.allies[0];
+    this.mount.maxHp = heroInit.maxHp.mul(data.prov.monture.pv_part_heros);
+    this.mount.hp = this.mount.maxHp;
     hc.pets.forEach((p, i) => mk2(p.nom, 'pet', p.element, p.intervalle, p.part_degats, i));
     hc.gardiens.forEach((g, i) => mk2(g.nom, 'guardian', g.element, g.intervalle, g.part_degats, i));
     this.assistCounters = hc.assistants.map(() => 0);
@@ -191,6 +199,7 @@ export class Combat {
       this.tickAssistants();
     }
     for (const a of this.allies) {
+      if (!a.alive) continue;
       a.cd -= dt;
       if (a.cd <= 0 && this.vivants().length) {
         a.cd += a.intervalle;
@@ -417,10 +426,28 @@ export class Combat {
     this.enemyHit(e, enr, spec.comportement === 'distance');
   }
 
+  /** Cible d'un ennemi : la monture (si elle tient encore) ou le heros. Jamais un pet ni un gardien. */
+  private cibleEnnemie(): Fighter {
+    if (this.mount.alive && this.rng.chance(this.data.prov.monture.chance_ciblee)) return this.mount;
+    return this.hero;
+  }
+
   private enemyHit(e: Fighter, mult: number, ranged: boolean): void {
     if (this.hero.hp.lte(0)) return;
     const spec = e.spec!;
-    this.events.push({ t: ranged ? 'projectile' : 'attack', src: e.uid, dst: this.hero.uid });
+    const cible = this.cibleEnnemie();
+    this.events.push({ t: ranged ? 'projectile' : 'attack', src: e.uid, dst: cible.uid });
+    if (cible === this.mount) {
+      const dmg = e.atk.mul(mult * multElement(this.data, e.element, this.mount.element));
+      this.mount.hp = this.mount.hp.sub(dmg);
+      this.events.push({ t: 'hit', src: e.uid, dst: this.mount.uid, amount: dmg, crit: false, mult: 1, element: e.element });
+      if (this.mount.hp.lte(0)) {
+        this.mount.hp = ZERO;
+        this.mount.alive = false;
+        this.events.push({ t: 'death', uid: this.mount.uid });
+      }
+      return;
+    }
     const dodge = stat(this.stats, 'dodge');
     if (dodge > 0 && this.rng.chance(Math.min(0.75, dodge))) {
       this.events.push({ t: 'miss', src: e.uid, dst: this.hero.uid });

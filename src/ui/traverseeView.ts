@@ -45,10 +45,10 @@ export class TraverseeView extends Container {
       this.addChild(g);
       this.bulles.push({ g, vx: 0, vy: 0 });
     }
-    const st = { fontFamily: POLICE_TITRE, fontSize: 30, fontWeight: '700' as const, fill: 0xf3dfa2, stroke: { color: 0x02080c, width: 5 }, align: 'center' as const, wordWrap: true, wordWrapWidth: 350 };
+    const st = { fontFamily: POLICE_TITRE, fontSize: 25, fontWeight: '700' as const, fill: 0xf3dfa2, stroke: { color: 0x02080c, width: 5 }, align: 'center' as const, wordWrap: true, wordWrapWidth: 350 };
     this.titre = new Text({ text: '', style: st });
     this.titre.anchor.set(0.5);
-    this.titre.position.set(195, 640);
+    this.titre.position.set(195, 630);
     this.sous = new Text({ text: '', style: { fontFamily: POLICE_UI, fontSize: 15, fontWeight: '700', fill: 0x7af4ff, letterSpacing: 4 } });
     this.sous.anchor.set(0.5);
     this.sous.position.set(195, 682);
@@ -137,6 +137,7 @@ export class TraverseeView extends Container {
       this.sous.style.fill = this.revelation.couleur;
       this.titre.alpha = this.sous.alpha = k;
       this.titre.scale.set(0.9 + 0.1 * k);
+      this.sous.y = this.titre.y + this.titre.height / 2 + 16;
     }
     // ouverture au noir (le Sonar vient de se refermer) puis fondu vers la rencontre
     this.noir.alpha = t < FERMETURE_SONAR_S ? 1 : t < FERMETURE_SONAR_S + 0.3 ? 1 - (t - FERMETURE_SONAR_S) / 0.3 : t > D - 0.12 ? ((t - (D - 0.12)) / 0.12) * 0.6 : 0;

@@ -19,6 +19,8 @@ export interface VisuelHeros {
   /** A appeler a chaque image (secondes). */
   maj(dt: number): void;
   detruire(): void;
+  /** Fige une pose (captures d'ecran et tests) ; null relance l'animation normale. */
+  figer?(anim: AnimHeros | null, t?: number): void;
 }
 
 /** Correspondance avec les animations d'un futur export Spine. */

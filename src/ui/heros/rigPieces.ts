@@ -76,6 +76,7 @@ export class RigPieces implements VisuelHeros {
   private anim: AnimHeros = 'attente';
   private ta = 0;
   private t = Math.random() * 10;
+  private fige = false;
 
   /** echelle : pixels d'ecran par pixel de la reference (ex. 0,1 => heros de ~126 px). */
   constructor(private def: DefRig, echelle: number) {
@@ -121,11 +122,18 @@ export class RigPieces implements VisuelHeros {
   /** Nom de l'animation en cours (tests, captures). */
   get animation(): AnimHeros { return this.anim; }
 
+  figer(anim: AnimHeros | null, t = 0): void {
+    this.fige = anim !== null;
+    if (anim) { this.anim = anim; this.ta = t; }
+    this.maj(0);
+  }
+
   maj(dt: number): void {
+    if (this.fige) dt = 0;
     this.t += dt;
     this.ta += dt;
     const d = DUREES[this.anim];
-    if (d && this.ta >= d) { this.anim = 'attente'; this.ta = 0; }
+    if (d && this.ta >= d && !this.fige) { this.anim = 'attente'; this.ta = 0; }
     const o = this.os;
     for (const [id, p] of Object.entries(this.repos)) { o[id].position.set(p.x, p.y); o[id].rotation = 0; }
     o.buste.scale.set(1, 1);

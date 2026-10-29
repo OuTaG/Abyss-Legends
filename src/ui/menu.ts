@@ -154,13 +154,15 @@ function ongletHeros(ctx: CtxMenu): HTMLElement {
     const slots = ['arme', 'casque', 'armure', 'palmes', 'montre', 'bouteilles'];
     c.appendChild(panneau(t('heros.onglet.equipement'), `<div class="grille-slots">${slots.map((s) => `<div class="slot">${iconeObjet('commun', null, s === 'arme' ? ICONES.arme : '')}<span>${t('equipement.' + s)}</span></div>`).join('')}</div>
       <div class="petit-texte">${t('equipement.visibles')}</div>`));
+    c.appendChild(panneau(t('equipement.armes'), `<div class="grille-armes"><div class="petit-texte"></div><div class="petit-texte">${t('equipement.commun_epique')}</div><div class="petit-texte">${t('equipement.legendaire_plus')}</div>${hc.catalogue.armes.map((a) => `<div>${badgeElement(a.element)}</div><div>${esc(a.base)}</div><div style="color:${COULEUR_RARETE.legendaire}">${esc(a.legendaire)}</div>`).join('')}</div>`));
     c.appendChild(panneau(t('raretes.titre'), `<div class="grille-raretes">${RARETES.map((r) => `<div class="slot">${iconeObjet(r, null, ICONES.arme, t('raretes.' + r))}<span style="color:${COULEUR_RARETE[r]}">${t('raretes.' + r)}</span></div>`).join('')}
       <div class="slot">${iconeObjet('mythique', 'S', ICONES.arme)}<span>${t('raretes.rang_s')}</span></div>
       <div class="slot">${iconeObjet('mythique', 'SS', ICONES.arme)}<span>${t('raretes.rang_ss')}</span></div></div>`));
   } else if (sousOnglet === 'gardiens') {
-    c.appendChild(panneau(t('heros.onglet.gardiens'), hc.gardiens.map((x) => `<div class="ligne-item">${iconeObjet('rare', null, '')}<div><b>${esc(x.nom)}</b> ${badgeElement(x.element)}<div class="petit-texte">${t('gardiens.intouchables')}</div></div></div>`).join('') + bientot('gardiens.progression')));
+    const actifs = hc.gardiens.map((x) => x.nom);
+    c.appendChild(panneau(t('heros.onglet.gardiens'), hc.catalogue.gardiens.map((x) => `<div class="ligne-item">${iconeObjet(x.rarete as RareteObjet, null, '')}<div><b>${esc(x.nom)}</b> ${badgeElement(x.element)}<div class="petit-texte">${t('raretes.' + x.rarete)}${actifs.includes(x.nom) ? ' · ' + t('heros.actif') : ''}</div></div></div>`).join('') + `<div class="petit-texte" style="margin-top:6px">${t('gardiens.intouchables')}</div>` + bientot('gardiens.progression')));
   } else if (sousOnglet === 'montures') {
-    c.appendChild(panneau(t('heros.onglet.montures'), `<div class="ligne-item">${iconeObjet('original', null, '')}<div><b>${esc(hc.monture.nom)}</b> ${badgeElement(hc.monture.element)}<div class="petit-texte">${t('montures.touchable')}</div></div></div>` + bientot('montures.expeditions')));
+    c.appendChild(panneau(t('heros.onglet.montures'), hc.catalogue.montures.map((x) => `<div class="ligne-item">${iconeObjet(x.rarete as RareteObjet, null, '')}<div><b>${esc(x.nom)}</b> ${badgeElement(null)}<div class="petit-texte">${t('raretes.' + x.rarete)}${x.nom === hc.monture.nom ? ' · ' + t('heros.actif') : ''}</div></div></div>`).join('') + `<div class="petit-texte" style="margin-top:6px">${t('montures.touchable')}</div>` + bientot('montures.expeditions')));
   } else if (sousOnglet === 'perles') {
     c.appendChild(panneau(t('heros.onglet.perles'), `<div class="grille-raretes">${RARETES.slice(0, 5).map((r) => `<div class="slot">${iconeObjet(r, null, '')}<span>${t('raretes.' + r)}</span></div>`).join('')}</div>` + bientot('perles.description')));
   } else {
@@ -200,6 +202,7 @@ function ongletPets(ctx: CtxMenu): HTMLElement {
   const c = h('div', 'page');
   c.appendChild(h('h2', 'titre-page', t('nav.pets')));
   c.appendChild(panneau(t('pets.actifs'), hc.pets.map((x) => `<div class="ligne-item">${iconeObjet('rare', null, ICONES.pets)}<div><b>${esc(x.nom)}</b> ${badgeElement(x.element)}<div class="petit-texte">${t('pets.intouchables')}</div></div></div>`).join('') + bientot('pets.oeufs')));
+  c.appendChild(panneau(t('pets.catalogue'), Object.entries(hc.catalogue.pets).map(([el, noms]) => `<div class="ligne-item">${badgeElement(el)}<div class="petit-texte">${noms.map(esc).join(' · ')}</div></div>`).join('')));
   return c;
 }
 

@@ -69,6 +69,7 @@ export class CombatView extends Container {
   private t = 0;
   private extraUtilises = 0;
   private combat: Combat | null = null;
+  private affichage: Record<string, string> = {};
 
   constructor() {
     super();
@@ -98,6 +99,7 @@ export class CombatView extends Container {
     this.extraUtilises = 0;
     const c = run.combat!;
     this.combat = c;
+    this.affichage = run.data.herosContent.affichage;
     // pets (au-dessus du heros) et gardiens (a ses cotes) : aucune barre de vie, ils ne sont jamais touches
     let ip = 0, ig = 0;
     for (const a of c.allies) {
@@ -344,7 +346,7 @@ export class CombatView extends Container {
         break;
       }
       case 'assistant': {
-        this.banniere.text = ev.nom.replace('Epique', 'Épique') + ' !';
+        this.banniere.text = (this.affichage[ev.nom] ?? ev.nom) + ' !';
         this.banniere.alpha = 1;
         this.flashEcran.alpha = 0.22;
         break;

@@ -174,3 +174,6 @@ label.opt { display: flex; justify-content: space-between; align-items: center; 
 .toast-zone { position: absolute; left: 0; right: 0; top: 200px; display: flex; flex-direction: column; align-items: center; gap: 6px; pointer-events: none !important; }
 .toast { background: #0a161eee; border: 1px solid #c9a24a; border-radius: 12px; padding: 6px 14px; font-weight: 700; font-size: 15px; animation: mont 2.6s forwards; }
 @keyframes mont { 0% { opacity: 0; transform: translateY(8px); } 10% { opacity: 1; transform: none; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-10px); } }
+.grille-armes { display: grid; grid-template-columns: auto 1fr 1fr; gap: 5px 10px; font-size: 13px; align-items: center; }
+.modal.defaite h2 { font-size: 40px; color: #e8453c; }
+.modal.defaite .tour { text-align: center; font-family: var(--police-titre); font-size: 24px; color: #f3dfa2; margin-bottom: 14px; }

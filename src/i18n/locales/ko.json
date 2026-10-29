@@ -130,12 +130,16 @@
  "shop.epuise": "",
  "shop.quitter": "",
  "fin.victoire": "",
- "fin.defaite": "",
  "fin.boss_vaincu": "",
- "fin.arret": "",
  "fin.gains": "",
  "fin.bilan": "",
  "fin.suivant": "",
  "fin.rejouer": "",
- "fin.menu": ""
+ "fin.menu": "",
+ "equipement.armes": "",
+ "equipement.commun_epique": "",
+ "equipement.legendaire_plus": "",
+ "pets.catalogue": "",
+ "fin.defaite_titre": "",
+ "fin.tour": ""
 }

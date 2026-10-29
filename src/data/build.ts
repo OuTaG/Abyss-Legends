@@ -30,13 +30,20 @@ export interface GameData {
     passifs_element: Record<string, Stats>;
     affichage: Record<string, string>;
     heros_defaut: string;
-    monture: { nom: string; element: Element | null; intervalle: number; part_degats: number; bonus: Stats };
+    monture: { nom: string; element: Element | null; rarete: string; intervalle: number; part_degats: number; bonus: Stats };
     pets: { nom: string; element: Element | null; intervalle: number; part_degats: number }[];
     gardiens: { nom: string; element: Element | null; intervalle: number; part_degats: number }[];
     assistants: {
       hero: string; intervalle_tours: number; description: string;
       capacite: { type: string; puissance: number }; secondaire: { type: string; duree?: number; puissance?: number };
     }[];
+    /** Catalogue du GDD (affichage seulement dans le prototype). */
+    catalogue: {
+      montures: { nom: string; rarete: string }[];
+      gardiens: { nom: string; element: Element | null; rarete: string }[];
+      armes: { element: Element | null; base: string; legendaire: string }[];
+      pets: Record<string, string[]>;
+    };
   };
   mutations: {
     raretes: Record<Rarete, { poids: number; couleur: string; pileMax: number; nom: string }>;

@@ -1,34 +1,244 @@
 {
-  "_doc": "Donnees de combat des heros, monture, pets, gardiens et assistants du prototype (valeurs de depart FIXES, CONTENU PROVISOIRE). Les 11 heros viennent de config/balance/heros.json (noms identiques) ; ici seulement leur passif de combat et leur affichage. La rarete ne change PAS la puissance dans le prototype.",
+  "_doc": "Donnees de combat des heros, monture, pets, gardiens et assistants du prototype (valeurs de depart FIXES). Noms : GDD 6.1 (heros), 8.1 (armes), 8.3 (pets), 8.4 (montures), 8.5 (gardiens). Les 11 heros de config/balance/heros.json gardent leur identifiant technique ; 'affichage' donne leur nom. Les statistiques restent PROVISOIRES ; la rarete ne change pas la puissance dans le prototype.",
   "passifs_element": {
-    "Courant":  { "multiHit": 0.25, "speedPct": 0.05 },
-    "Encre":    { "dodge": 0.15 },
-    "Lumen":    { "critChance": 0.15 },
-    "Pression": { "stunChance": 0.12, "atkPct": 0.05 },
-    "Corail":   { "dr": 0.12, "regen": 0.004 },
-    "neutre":   { "atkPct": 0.03, "hpPct": 0.03 }
+    "Courant": {
+      "multiHit": 0.25,
+      "speedPct": 0.05
+    },
+    "Encre": {
+      "dodge": 0.15
+    },
+    "Lumen": {
+      "critChance": 0.15
+    },
+    "Pression": {
+      "stunChance": 0.12,
+      "atkPct": 0.05
+    },
+    "Corail": {
+      "dr": 0.12,
+      "regen": 0.004
+    },
+    "neutre": {
+      "atkPct": 0.03,
+      "hpPct": 0.03
+    }
   },
   "affichage": {
     "Plongeur": "Plongeur",
-    "Epique Lumen": "Épique Lumen", "Epique Corail": "Épique Corail", "Epique Courant": "Épique Courant",
-    "Epique Pression": "Épique Pression", "Epique Encre": "Épique Encre",
-    "Legendaire Corail": "Légendaire Corail", "Legendaire Lumen": "Légendaire Lumen",
-    "Legendaire Pression": "Légendaire Pression", "Legendaire Courant": "Légendaire Courant",
-    "Legendaire Encre": "Légendaire Encre"
+    "Epique Courant": "Dauphin guerrier",
+    "Legendaire Courant": "Sirène des courants",
+    "Epique Encre": "Pieuvre bienveillante",
+    "Legendaire Encre": "Ninja-seiche",
+    "Epique Lumen": "Exploratrice à lanterne",
+    "Legendaire Lumen": "Prêtresse méduse",
+    "Epique Pression": "Phoque costaud",
+    "Legendaire Pression": "Colosse des profondeurs",
+    "Epique Corail": "Loutre de mer",
+    "Legendaire Corail": "Triton du récif"
   },
   "heros_defaut": "Plongeur",
-  "monture": { "nom": "Tortue de mer", "element": null, "intervalle": 1.7, "part_degats": 0.45, "bonus": { "critChance": 0.08 } },
+  "monture": {
+    "nom": "Raie manta",
+    "element": null,
+    "rarete": "epique",
+    "intervalle": 1.7,
+    "part_degats": 0.45,
+    "bonus": {
+      "critChance": 0.08
+    }
+  },
   "pets": [
-    { "nom": "Étoile de mer", "element": "Corail", "intervalle": 1.5, "part_degats": 0.22 },
-    { "nom": "Poulpe bébé", "element": "Encre", "intervalle": 1.5, "part_degats": 0.22 },
-    { "nom": "Poisson-lanterne", "element": "Lumen", "intervalle": 1.5, "part_degats": 0.22 }
+    {
+      "nom": "Étoile de mer épineuse",
+      "element": "Corail",
+      "intervalle": 1.5,
+      "part_degats": 0.22
+    },
+    {
+      "nom": "Seiche",
+      "element": "Encre",
+      "intervalle": 1.5,
+      "part_degats": 0.22
+    },
+    {
+      "nom": "Poisson-lanterne",
+      "element": "Lumen",
+      "intervalle": 1.5,
+      "part_degats": 0.22
+    }
   ],
   "gardiens": [
-    { "nom": "Lutin de l'écume", "element": "Courant", "intervalle": 2.2, "part_degats": 0.45 },
-    { "nom": "Veilleur de nacre", "element": null, "intervalle": 2.6, "part_degats": 0.5 }
+    {
+      "nom": "Feu follet abyssal",
+      "element": "Lumen",
+      "intervalle": 2.2,
+      "part_degats": 0.45
+    },
+    {
+      "nom": "Nautile mécanique",
+      "element": null,
+      "intervalle": 2.6,
+      "part_degats": 0.5
+    }
   ],
   "assistants": [
-    { "hero": "Epique Lumen", "intervalle_tours": 2, "capacite": { "type": "degats_zone", "puissance": 1.1 }, "secondaire": { "type": "etourdit", "duree": 1.0 }, "description": "Éclair de lumière : touche tous les ennemis" },
-    { "hero": "Epique Corail", "intervalle_tours": 3, "capacite": { "type": "soin", "puissance": 0.06 }, "secondaire": { "type": "bouclier", "puissance": 0.08 }, "description": "Récif protecteur : soin et bouclier" }
-  ]
+    {
+      "hero": "Epique Lumen",
+      "intervalle_tours": 2,
+      "capacite": {
+        "type": "degats_zone",
+        "puissance": 1.1
+      },
+      "secondaire": {
+        "type": "etourdit",
+        "duree": 1.0
+      },
+      "description": "Éclair de lumière : touche tous les ennemis"
+    },
+    {
+      "hero": "Epique Corail",
+      "intervalle_tours": 3,
+      "capacite": {
+        "type": "soin",
+        "puissance": 0.06
+      },
+      "secondaire": {
+        "type": "bouclier",
+        "puissance": 0.08
+      },
+      "description": "Récif protecteur : soin et bouclier"
+    }
+  ],
+  "catalogue": {
+    "montures": [
+      {
+        "nom": "Raie manta",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Espadon",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Bébé Nessie",
+        "rarete": "legendaire"
+      },
+      {
+        "nom": "Léviathan juvénile",
+        "rarete": "legendaire"
+      }
+    ],
+    "gardiens": [
+      {
+        "nom": "Feu follet abyssal",
+        "element": "Lumen",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Golem de corail",
+        "element": "Corail",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Spectre d'encre",
+        "element": "Encre",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Esprit des marées",
+        "element": "Courant",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Œil des profondeurs",
+        "element": "Pression",
+        "rarete": "epique"
+      },
+      {
+        "nom": "Nautile mécanique",
+        "element": null,
+        "rarete": "epique"
+      },
+      {
+        "nom": "Méduse runique",
+        "element": null,
+        "rarete": "legendaire"
+      }
+    ],
+    "armes": [
+      {
+        "element": "Courant",
+        "base": "Chakram",
+        "legendaire": "Lames jumelles d'espadon"
+      },
+      {
+        "element": "Encre",
+        "base": "Fouet tentaculaire",
+        "legendaire": "Faux des abysses"
+      },
+      {
+        "element": "Lumen",
+        "base": "Lame-lanterne",
+        "legendaire": "Sceptre bioluminescent"
+      },
+      {
+        "element": "Pression",
+        "base": "Masse de scaphandrier",
+        "legendaire": "Marteau-ancre"
+      },
+      {
+        "element": "Corail",
+        "base": "Épée de récif",
+        "legendaire": "Trident de corail"
+      },
+      {
+        "element": null,
+        "base": "Couteau de plongée",
+        "legendaire": "Sabre de pirate"
+      }
+    ],
+    "pets": {
+      "Courant": [
+        "Poisson-volant",
+        "Bébé espadon",
+        "Hippocampe",
+        "Poisson-sabre",
+        "Bébé mako",
+        "Sardine-éclair"
+      ],
+      "Encre": [
+        "Seiche",
+        "Bébé poulpe",
+        "Poulpe mimétique",
+        "Nautile",
+        "Argonaute",
+        "Calmar vampire juvénile"
+      ],
+      "Lumen": [
+        "Poisson-lanterne",
+        "Bébé baudroie",
+        "Méduse luciole",
+        "Pyrosome",
+        "Calmar luciole",
+        "Poisson-hachette"
+      ],
+      "Pression": [
+        "Crevette-mante",
+        "Bébé requin-marteau",
+        "Mérou",
+        "Bébé cachalot",
+        "Crabe boxeur",
+        "Homard"
+      ],
+      "Corail": [
+        "Dragon de mer feuillu",
+        "Bernard-l'ermite",
+        "Oursin-crayon",
+        "Étoile de mer épineuse",
+        "Tortue imbriquée",
+        "Poisson-globe"
+      ]
+    }
+  }
 }

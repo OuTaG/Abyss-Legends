@@ -129,17 +129,41 @@ function lancerPartie(): void {
   traversee = null;
   run = new Run(data, diff, {
     niveau, heroId: profil.parametres.heroId, ratio, graine: Math.floor(Math.random() * 2 ** 31),
-    onMilestone: (ms: Milestone) => {
-      const cles = reclamerPalier(profil, data, niveau, ms);
-      if (cles.length) toast(t('partie.cles_gagnees', { cles: cles.map((c) => t('cles.' + c)).join(' + ') }));
-      save();
-    },
+    onMilestone: surPalier(niveau),
   });
   progres(profil, niveau).record = Math.max(progres(profil, niveau).record, 1);
   save();
+  demarrerAffichagePartie();
+}
+
+const surPalier = (niveau: number) => (ms: Milestone) => {
+  const cles = reclamerPalier(profil, data, niveau, ms);
+  if (cles.length) toast(t('partie.cles_gagnees', { cles: cles.map((c) => t('cles.' + c)).join(' + ') }));
+  save();
+};
+
+function demarrerAffichagePartie(): void {
   construireHud();
   phaseAffichee = '';
   syncPhase();
+}
+
+/** Reprend la partie sauvegardee au dernier choix de Sonar (application fermee en cours de partie). */
+function reprendrePartie(): boolean {
+  const sv = profil.partieEnCours;
+  if (!sv) return false;
+  try {
+    run = Run.restaurer(data, diff, sv, surPalier(sv.opts.niveau));
+  } catch (e) {
+    console.warn('Partie en cours illisible, abandonnee', e);
+    profil.partieEnCours = null;
+    save();
+    return false;
+  }
+  partieEnregistree = false;
+  traversee = null;
+  demarrerAffichagePartie();
+  return true;
 }
 
 function construireHud(): void {
@@ -234,7 +258,12 @@ function syncPhase(): void {
   ocean.appliquer(run.info.monde.palette);
   majHud();
   switch (run.phase) {
-    case 'sonar': afficherSonar(); break;
+    case 'sonar':
+      // sauvegarde de la partie a chaque tour (GDD 4.1)
+      profil.partieEnCours = run.sauvegarde();
+      save();
+      afficherSonar();
+      break;
     case 'combat':
       afficherScene('combat');
       combatView.demarrer(run);
@@ -271,6 +300,8 @@ function afficherSonar(): void {
 function choisirEcho(i: number): void {
   const r = run!;
   if (r.phase !== 'sonar' || traversee) return;
+  // le choix est sauvegarde avant d'etre joue : rouvrir l'application ne permet pas de choisir un autre echo
+  if (profil.partieEnCours) { profil.partieEnCours.choix = i; save(); }
   r.chooseEcho(i);
   traversee = new Traversee(DUREE_TRAVERSEE_S);
   horlogeTraversee = 0;
@@ -353,15 +384,23 @@ function afficherFin(): void {
   const victoire = r.phase === 'victoire';
   if (!partieEnregistree) {
     partieEnregistree = true;
+    profil.partieEnCours = null;
     lastRecompense = terminerPartie(profil, data, r.opts.niveau, r.step, victoire);
     save();
   }
   const rec = lastRecompense!;
   const m = modal();
-  m.appendChild(h('h2', '', victoire ? t('fin.victoire') : t('fin.defaite')));
-  m.appendChild(h('div', 'sous', victoire ? t('fin.boss_vaincu', { nom: esc(r.info.boss.nom) }) : t('fin.arret', { n: r.step })));
-  m.appendChild(h('div', 'recompense', t('fin.gains', { or: fmt(rec.or), xp: fmt(rec.xpHeros), nourriture: fmt(rec.nourriture) }) + (rec.gemmes ? ` · ${rec.gemmes} ${t('ressources.gemmes')}` : '')));
-  m.appendChild(h('div', 'recompense', t('fin.bilan', { c: r.nbCombats, m: r.nbMutations, n: r.niveauHeros })));
+  if (victoire) {
+    m.appendChild(h('h2', '', t('fin.victoire')));
+    m.appendChild(h('div', 'sous', t('fin.boss_vaincu', { nom: esc(r.info.boss.nom) })));
+    m.appendChild(h('div', 'recompense', t('fin.gains', { or: fmt(rec.or), xp: fmt(rec.xpHeros), nourriture: fmt(rec.nourriture) }) + (rec.gemmes ? ` · ${rec.gemmes} ${t('ressources.gemmes')}` : '')));
+    m.appendChild(h('div', 'recompense', t('fin.bilan', { c: r.nbCombats, m: r.nbMutations, n: r.niveauHeros })));
+  } else {
+    // GDD 4.1 : l'ecran de defaite affiche simplement « Defaite » et « Tour X »
+    m.classList.add('defaite');
+    m.appendChild(h('h2', '', t('fin.defaite_titre')));
+    m.appendChild(h('div', 'tour', t('fin.tour', { n: r.step })));
+  }
   if (victoire && r.opts.niveau === profil.parametres.niveau && profil.parametres.niveau < niveauMax(data)) {
     const nx = h('button', 'btn', t('fin.suivant'));
     nx.onclick = () => { profil.parametres.niveau++; save(); afficherMenu(); };
@@ -428,7 +467,7 @@ async function init(): Promise<void> {
   setInterval(save, 10000);
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
-  afficherMenu();
+  if (!reprendrePartie()) afficherMenu();
   // acces de test (Playwright / console)
   (window as any).__abyss = {
     data,
@@ -442,6 +481,7 @@ async function init(): Promise<void> {
     get vitesse() { return vitesse; },
     menu: afficherMenu,
     lancer: lancerPartie,
+    sauver: save,
     sonar: () => sonar,
     combatView: () => combatView,
     scenes: () => ({ menu: menuScene.visible, sonar: sonar.visible, traversee: traverseeView.visible, combat: combatView.visible }),

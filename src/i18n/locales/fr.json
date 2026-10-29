@@ -130,12 +130,16 @@
  "shop.epuise": "épuisé",
  "shop.quitter": "Quitter le marchand",
  "fin.victoire": "Niveau terminé !",
- "fin.defaite": "Vous avez péri...",
  "fin.boss_vaincu": "{nom} est vaincu.",
- "fin.arret": "La partie s'arrête au choix {n}. Les mutations sont perdues.",
  "fin.gains": "Gains : {or} or · {xp} XP de héros · {nourriture} nourriture",
  "fin.bilan": "Combats : {c} · Mutations : {m} · Niveau de partie : {n}",
  "fin.suivant": "Niveau suivant",
  "fin.rejouer": "Rejouer ce niveau",
- "fin.menu": "Écran principal"
+ "fin.menu": "Écran principal",
+ "equipement.armes": "Armes (une famille par élément + neutre)",
+ "equipement.commun_epique": "Commun → Épique",
+ "equipement.legendaire_plus": "Légendaire (→ Mythique, S, SS)",
+ "pets.catalogue": "Les 30 pets",
+ "fin.defaite_titre": "Défaite",
+ "fin.tour": "Tour {n}"
 }

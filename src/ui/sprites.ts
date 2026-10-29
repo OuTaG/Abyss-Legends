@@ -128,45 +128,39 @@ export function dessinerHeros(g: Graphics, couleur: number): void {
   g.poly([-14, 30, -26, 46, -4, 46]).fill(fonce(couleur)).poly([14, 30, 4, 46, 26, 46]).fill(fonce(couleur));
 }
 
-/** Monture provisoire (tortue de mer, regard vers la droite), en deux couches : `arriere` (tete, nageoires)
- *  derriere le heros, `avant` (carapace) devant ses jambes, pour qu'il paraisse assis dessus.
- *  Origine : sommet de la carapace, la ou le heros s'assoit. Largeur ~170 px a l'echelle 1. */
+/** Monture provisoire (raie manta, sans element, regard vers la droite), en deux couches : `arriere` (aile lointaine,
+ *  queue) derriere le heros, `avant` (corps, aile proche) devant ses jambes, pour qu'il paraisse assis dessus.
+ *  Origine : dos de la raie, la ou le heros s'assoit. Largeur ~200 px a l'echelle 1. */
 export function dessinerMonture(arriere: Graphics, avant: Graphics): void {
-  const peau = 0x6f8a5e, peauF = 0x34452c, ecaille = 0x4a5e3c, ecailleF = 0x26321f, ventre = 0xc9b77a, cuir = 0x7a4a26;
+  const dos = 0x22344a, dosF = 0x0e1824, clairDos = 0x4a6a86, ventre = 0xdfe6ea, ventreF = 0x8a9aa6;
   arriere.clear();
-  // nageoire arriere (loin) et nageoire avant (loin)
-  arriere.poly([-50, 12, -92, 26, -96, 38, -58, 30]).fill(peauF).stroke({ width: 2, color: 0x1a2316 });
-  arriere.poly([30, 10, 70, -6, 96, -2, 60, 20]).fill(peauF).stroke({ width: 2, color: 0x1a2316 });
-  // cou et tete
-  arriere.poly([52, 4, 78, -6, 88, 12, 58, 22]).fill(peau).stroke({ width: 2, color: peauF });
-  arriere.ellipse(92, 4, 20, 15).fill(peau).stroke({ width: 2.5, color: peauF });
-  arriere.circle(98, -1, 4.2).fill(0xf1e3a0).stroke({ width: 1.5, color: 0x1a2316 });
-  arriere.circle(99, -1, 2).fill(0x101410);
-  arriere.moveTo(100, 11).quadraticCurveTo(106, 12, 110, 8).stroke({ width: 2, color: peauF });
-  for (const [x, y] of [[86, -6], [80, 8], [90, 12]]) arriere.circle(x, y, 2).fill({ color: peauF, alpha: 0.6 });
+  // queue fine
+  arriere.moveTo(-70, 8).bezierCurveTo(-100, 10, -118, 20, -140, 16).stroke({ width: 3, color: dosF });
+  // aile lointaine, relevee derriere le dos
+  arriere.moveTo(-6, -8).bezierCurveTo(-30, -30, -58, -52, -96, -50).bezierCurveTo(-74, -36, -58, -16, -44, 4).closePath()
+    .fill(0x1a2a3c).stroke({ width: 2.5, color: dosF });
+  arriere.moveTo(-20, -14).bezierCurveTo(-44, -32, -66, -44, -88, -47).stroke({ width: 1.5, color: clairDos, alpha: 0.5 });
 
   avant.clear();
-  // ventre (plastron)
-  avant.ellipse(0, 22, 76, 13).fill(ventre).stroke({ width: 2.5, color: 0x6b5a30 });
-  // carapace : dome
-  avant.moveTo(-82, 22).bezierCurveTo(-80, -26, 76, -30, 80, 22).closePath().fill(ecaille).stroke({ width: 3, color: ecailleF });
-  // ecailles hexagonales
-  const hex = (cx: number, cy: number, r: number) => {
-    const pts: number[] = [];
-    for (let i = 0; i < 6; i++) { const a = Math.PI / 6 + (i * Math.PI) / 3; pts.push(cx + Math.cos(a) * r, cy + Math.sin(a) * r * 0.62); }
-    avant.poly(pts).fill(0x56704a).stroke({ width: 2, color: ecailleF });
-  };
-  for (const [x, y, r] of [[-46, 8, 16], [-14, 2, 17], [18, 2, 17], [48, 8, 15], [-30, -8, 13], [2, -10, 13], [32, -8, 13]]) hex(x, y, r);
-  avant.moveTo(-70, 0).bezierCurveTo(-40, -22, 40, -24, 70, 0).stroke({ width: 2, color: 0x93a878, alpha: 0.45 });
-  // bord de la carapace
-  avant.moveTo(-82, 22).lineTo(80, 22).stroke({ width: 3, color: ecailleF });
-  for (let i = -70; i <= 66; i += 17) avant.moveTo(i, 22).lineTo(i + 4, 28).stroke({ width: 2, color: ecailleF });
+  // corps : dos sombre et ventre clair
+  avant.moveTo(-76, 8).bezierCurveTo(-60, -16, 40, -22, 76, -4).bezierCurveTo(88, 2, 88, 14, 74, 18)
+    .bezierCurveTo(30, 30, -40, 28, -76, 8).closePath().fill(dos).stroke({ width: 3, color: dosF });
+  avant.moveTo(-66, 12).bezierCurveTo(-30, 26, 30, 28, 74, 16).bezierCurveTo(40, 22, -20, 22, -66, 12).closePath().fill(ventre);
+  for (let i = 0; i < 5; i++) avant.moveTo(30 + i * 7, 16).lineTo(28 + i * 7, 22).stroke({ width: 1.5, color: ventreF });
+  // taches claires d'epaules (motif de la manta)
+  avant.ellipse(20, -8, 16, 5).fill({ color: clairDos, alpha: 0.7 }).ellipse(-22, -6, 12, 4).fill({ color: clairDos, alpha: 0.5 });
+  // lobes cephaliques et oeil
+  avant.moveTo(76, -4).bezierCurveTo(92, -10, 98, -2, 90, 4).stroke({ width: 4, color: dosF });
+  avant.moveTo(78, 14).bezierCurveTo(96, 16, 98, 26, 88, 26).stroke({ width: 4, color: dosF });
+  avant.circle(68, 2, 3.4).fill(0xf1e3a0).stroke({ width: 1.2, color: 0x05080c });
+  avant.circle(69, 2, 1.6).fill(0x05080c);
   // bord avant de la selle (le heros est assis juste derriere)
-  avant.roundRect(-34, -14, 60, 9, 4).fill(cuir).stroke({ width: 2, color: 0x3a220f });
-  avant.circle(-28, -9.5, 1.8).fill(0xd8c27a).circle(20, -9.5, 1.8).fill(0xd8c27a);
-  // nageoire avant (proche)
-  avant.poly([34, 24, 74, 34, 100, 50, 60, 44]).fill(peau).stroke({ width: 2.5, color: peauF });
-  avant.poly([-56, 26, -88, 40, -70, 46]).fill(peau).stroke({ width: 2, color: peauF });
+  avant.roundRect(-34, -16, 60, 9, 4).fill(0x7a4a26).stroke({ width: 2, color: 0x3a220f });
+  avant.circle(-28, -11.5, 1.8).fill(0xd8c27a).circle(20, -11.5, 1.8).fill(0xd8c27a);
+  // aile proche, rabattue vers le bas et l'arriere
+  avant.moveTo(34, 12).bezierCurveTo(10, 30, -30, 50, -92, 52).bezierCurveTo(-70, 38, -44, 24, -24, 14).closePath()
+    .fill(0x2c4258).stroke({ width: 2.5, color: dosF });
+  avant.moveTo(20, 18).bezierCurveTo(-10, 32, -40, 44, -82, 49).stroke({ width: 1.5, color: clairDos, alpha: 0.6 });
 }
 
 export function dessinerPet(g: Graphics, couleur: number, type: number): void {

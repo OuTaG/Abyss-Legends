@@ -130,12 +130,16 @@
  "shop.epuise": "sold out",
  "shop.quitter": "Leave the merchant",
  "fin.victoire": "Level cleared!",
- "fin.defaite": "You perished...",
  "fin.boss_vaincu": "{nom} is defeated.",
- "fin.arret": "The run ends at choice {n}. Mutations are lost.",
  "fin.gains": "Rewards: {or} gold · {xp} hero XP · {nourriture} food",
  "fin.bilan": "Battles: {c} · Mutations: {m} · Run level: {n}",
  "fin.suivant": "Next level",
  "fin.rejouer": "Replay this level",
- "fin.menu": "Main screen"
+ "fin.menu": "Main screen",
+ "equipement.armes": "Weapons (one family per element + neutral)",
+ "equipement.commun_epique": "Common → Epic",
+ "equipement.legendaire_plus": "Legendary (→ Mythic, S, SS)",
+ "pets.catalogue": "The 30 pets",
+ "fin.defaite_titre": "Defeat",
+ "fin.tour": "Turn {n}"
 }

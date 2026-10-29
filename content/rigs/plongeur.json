@@ -1,0 +1,30 @@
+{
+  "_doc": "Rig provisoire du plongeur (pièces PNG assemblées dans Pixi en attendant l'export Spine). Coordonnées 'at' : position de l'articulation dans l'espace de plongeur_reference_v1.jpg (1500 x 2000 px) ; 'pivot' : même articulation dans l'image de la pièce (px) ; 'rot' en degrés ; 'back' dessinés derrière la pièce, 'front' devant.",
+  "dossier": "assets/heros/plongeur/pieces",
+  "sol": [760, 1640],
+  "hauteur": 1260,
+  "racine": {
+    "id": "racine", "at": [760, 1640],
+    "front": [
+      { "id": "jambe_arriere", "img": "jambe_arriere", "pivot": [90, 25], "at": [835, 1300], "scale": 0.8, "rot": -3,
+        "front": [{ "id": "botte_arriere", "img": "botte_arriere", "pivot": [70, 25], "at": [850, 1535], "scale": 0.9 }] },
+      { "id": "jambe_avant", "img": "jambe_avant", "pivot": [115, 25], "at": [725, 1300], "scale": 0.87, "rot": 10,
+        "front": [{ "id": "botte_avant", "img": "botte_avant", "pivot": [80, 30], "at": [610, 1565], "scale": 0.95 }] },
+      { "id": "bassin", "img": "bassin", "pivot": [130, 85], "at": [770, 1270], "scale": 0.95 },
+      { "id": "buste", "at": [775, 1220],
+        "back": [
+          { "id": "bouteille", "img": "bouteille", "pivot": [100, 165], "at": [572, 1075], "scale": 1.05, "rot": 12 },
+          { "id": "bras_arriere", "img": "bras_arriere", "pivot": [40, 40], "at": [895, 1035], "scale": 0.78, "rot": 7,
+            "front": [{ "id": "main_arriere", "img": "main_arriere", "pivot": [70, 20], "at": [990, 1175], "scale": 0.8 }] }
+        ],
+        "img": "torse", "pivot": [185, 30], "at_img": [800, 950], "scale": [0.95, 0.82],
+        "front": [
+          { "id": "ceinture", "img": "ceinture", "pivot": [120, 70], "at": [775, 1195], "scale": 1.05 },
+          { "id": "tete", "img": "tete", "pivot": [320, 415], "at": [840, 935], "scale": 1.29 },
+          { "id": "bras_avant", "img": "bras_avant", "pivot": [205, 50], "at": [655, 1005], "scale": 1.0, "rot": -6,
+            "front": [{ "id": "main_avant", "img": "main_avant", "pivot": [60, 15], "at": [508, 1186], "scale": 0.85,
+              "back": [{ "id": "harpon", "img": "harpon", "pivot": [170, 70], "at": [490, 1262], "scale": 1.25, "rot": -2.5 }] }] }
+        ] }
+    ]
+  }
+}

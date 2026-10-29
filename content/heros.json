@@ -17,7 +17,7 @@
     "Legendaire Encre": "Légendaire Encre"
   },
   "heros_defaut": "Plongeur",
-  "monture": { "nom": "Hippocampe", "element": null, "intervalle": 1.7, "part_degats": 0.45, "bonus": { "critChance": 0.08 } },
+  "monture": { "nom": "Tortue de mer", "element": null, "intervalle": 1.7, "part_degats": 0.45, "bonus": { "critChance": 0.08 } },
   "pets": [
     { "nom": "Étoile de mer", "element": "Corail", "intervalle": 1.5, "part_degats": 0.22 },
     { "nom": "Poulpe bébé", "element": "Encre", "intervalle": 1.5, "part_degats": 0.22 },

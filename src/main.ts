@@ -2,16 +2,24 @@ import { Application } from 'pixi.js';
 import { GAME_DATA } from './data';
 import { Difficulty, niveauInfo, niveauMax } from './core/difficulty';
 import { Run, type Milestone } from './core/run';
-import { D, fmt, fromSave } from './core/num';
-import {
-  QUALITES_CLES, depenserEnergie, energieActuelle, progres, reclamerPalier, secondesAvantPoint, terminerPartie, type Profil,
-} from './core/profile';
-import { charger, exporter, importer, sauvegarder } from './core/save';
+import { D, fmt } from './core/num';
+import { depenserEnergie, energieActuelle, progres, reclamerPalier, terminerPartie, type Profil } from './core/profile';
+import { CLE_STOCKAGE, charger, exporter, importer, sauvegarder } from './core/save';
+import { DUREE_TRAVERSEE_S, Traversee, facteurTemps } from './core/rythme';
+import { CHOIX_MINIBOSS, NB_CHOIX } from './core/sonar';
+import { ELEMENT_COULEUR } from './core/elements';
+import type { Element } from './core/types';
 import { Ocean } from './ui/background';
 import { CombatView } from './ui/combatView';
 import { SonarView } from './ui/sonarView';
-import { badgeElement, esc, h, legendeElements } from './ui/dom';
-import { ELEMENT_COULEUR } from './core/elements';
+import { TraverseeView, FERMETURE_SONAR_S, type Revelation } from './ui/traverseeView';
+import { MenuScene } from './ui/menuScene';
+import { construireMenu, construireReglages, type CtxMenu } from './ui/menu';
+import { prechargerRigs } from './ui/heros';
+import { esc, h } from './ui/dom';
+import { ICONES } from './ui/icones';
+import { RARETE_MUTATION, appliquerTheme, num } from './ui/theme';
+import { definirLangue, t } from './i18n';
 
 const data = GAME_DATA;
 const diff = new Difficulty(data);
@@ -22,19 +30,25 @@ let run: Run | null = null;
 let phaseAffichee = '';
 let partieEnregistree = false;
 let hud: HudRefs | null = null;
+let traversee: Traversee | null = null;
+let horlogeTraversee = 0; // temps (reel x reglage de test) ecoule pendant la derniere traversee
+let vitesse = 1; // combats x2 avec l'abonnement
 let timeScale = 1; // reglage de test (Playwright)
+let lastRecompense: ReturnType<typeof terminerPartie> | null = null;
 
 const ui = document.getElementById('ui')!;
 const stage = document.getElementById('stage')!;
 const toastZone = h('div', 'toast-zone');
 
 interface HudRefs {
-  root: HTMLElement; choix: HTMLElement; pieces: HTMLElement; hpFill: HTMLElement; hpShield: HTMLElement; hpTxt: HTMLElement;
-  xpFill: HTMLElement; xpTxt: HTMLElement; chips: HTMLElement; vit: HTMLButtonElement; assist: HTMLElement; nbMut: number;
+  root: HTMLElement; titre: HTMLElement; sous: HTMLElement; piste: HTMLElement; curseur: HTMLElement; pieces: HTMLElement;
+  niv: HTMLElement; xpFill: HTMLElement; vit: HTMLButtonElement;
+  combat: HTMLElement; hpHeros: HTMLElement; hpHerosTxt: HTMLElement; hpMonture: HTMLElement; hpMontureTxt: HTMLElement;
+  chips: HTMLElement; assist: HTMLElement; nbMut: number;
 }
 
 const app = new Application();
-let ocean: Ocean, sonar: SonarView, combatView: CombatView;
+let ocean: Ocean, sonar: SonarView, combatView: CombatView, traverseeView: TraverseeView, menuScene: MenuScene;
 
 function fit(): void {
   const s = Math.min(window.innerWidth / W, window.innerHeight / H);
@@ -47,121 +61,63 @@ function save(): void { sauvegarder(profil, localStorage); }
 const maintenant = (): number => Date.now();
 
 function toast(msg: string): void {
-  const t = h('div', 'toast', esc(msg));
-  toastZone.appendChild(t);
-  setTimeout(() => t.remove(), 2700);
+  const el = h('div', 'toast', esc(msg));
+  toastZone.appendChild(el);
+  setTimeout(() => el.remove(), 2700);
+}
+
+function afficherScene(nom: 'menu' | 'sonar' | 'traversee' | 'combat' | 'aucune'): void {
+  menuScene.visible = nom === 'menu';
+  sonar.visible = nom === 'sonar';
+  traverseeView.visible = nom === 'traversee';
+  combatView.visible = nom === 'combat';
 }
 
 // ---------------------------------------------------------------------------------------------- ecran principal
+const ctxMenu: CtxMenu = {
+  data, diff,
+  profil: () => profil,
+  save,
+  maintenant,
+  lancerPartie: () => lancerPartie(),
+  rafraichir: () => afficherMenu(),
+  ouvrirReglages: () => ouvrirReglages(),
+};
+
 function afficherMenu(): void {
   run = null;
   hud = null;
+  traversee = null;
   phaseAffichee = 'menu';
-  sonar.visible = false;
-  combatView.visible = false;
-  const niveau = profil.parametres.niveau;
-  const info = niveauInfo(data, niveau);
-  ocean.appliquer(info.monde.palette);
-  ui.replaceChildren();
-  const m = h('div', 'menu');
-  const pr = progres(profil, niveau);
-  const nrj = energieActuelle(profil, data, maintenant());
-  const ratio = (data.prov.puissance_joueur.ratios as Record<string, number>)[profil.parametres.preset] ?? 1;
-
-  m.appendChild(h('h1', '', 'Abyss Legends'));
-  m.appendChild(h('div', 'tag', 'Prototype jouable · un niveau complet du monde ' + info.monde.id));
-
-  const pNiv = h('div', 'panneau');
-  pNiv.innerHTML = `<h3>Niveau</h3>
-    <div class="niv-select"><button class="btn petit sec" id="prev">&lt;</button>
-    <div class="centre"><div class="petit-texte">Monde ${info.monde.id} · ${esc(info.monde.nom)}</div><div class="gros">Niveau ${niveau}</div>
-    <div>Boss : <b>${esc(info.boss.nom)}</b> ${badgeElement(info.boss.element)}${info.boss8 ? ' <span class="petit-texte">(boss n°8, meilleures clés)</span>' : ''}</div></div>
-    <button class="btn petit sec" id="next">&gt;</button></div>
-    <div class="grille2" style="margin-top:8px">
-      <div>Puissance recommandée</div><div><b>${fmt(diff.puissance(niveau))}</b></div>
-      <div>Record du niveau</div><div><b id="record">${pr.termine ? 'Terminé' : pr.record ? `choix ${pr.record} / 30` : '—'}</b>${pr.termine ? ' (30 / 30)' : ''}</div>
-      <div>Clés déjà gagnées</div><div>${[pr.cles.c10, pr.cles.c20, pr.cles.fin].map((x, i) => `<span class="petit-texte">${['10', '20', 'fin'][i]}${x ? ' ✓' : ' ·'}</span>`).join(' ')}</div>
-    </div>`;
-  m.appendChild(pNiv);
-
-  const pEn = h('div', 'panneau');
-  const sec = secondesAvantPoint(profil, data, maintenant());
-  pEn.innerHTML = `<div class="ligne"><div><b>Énergie ${nrj} / ${data.energie.plafond_regeneration}</b><div class="petit-texte">Coût d'une partie : ${data.energie.cout_tentative}${sec ? ` · prochain point dans ${Math.floor(sec / 60)} min ${sec % 60} s` : ''}</div></div></div>`;
-  m.appendChild(pEn);
-
-  const go = h('button', 'btn gros-btn', nrj >= data.energie.cout_tentative ? 'PLONGER' : 'Plus d\'énergie', { id: 'go' });
-  if (nrj < data.energie.cout_tentative) go.setAttribute('disabled', '');
-  go.onclick = () => lancerPartie();
-  m.appendChild(go);
-
-  // heros et equipe
-  const pHero = h('div', 'panneau');
+  afficherScene('menu');
   const hc = data.herosContent;
-  const heros = data.heros.heros;
-  const sel = h('select', '', heros.map((x) => `<option value="${x.nom}" ${x.nom === profil.parametres.heroId ? 'selected' : ''}>${hc.affichage[x.nom] ?? x.nom}${x.element ? ' (' + x.element + ')' : ' (neutre)'}</option>`).join(''), { id: 'hero' });
-  sel.onchange = () => { profil.parametres.heroId = sel.value; save(); afficherMenu(); };
-  const hero = heros.find((x) => x.nom === profil.parametres.heroId)!;
-  pHero.innerHTML = `<h3>Équipe (valeurs de départ fixes)</h3>`;
-  const l1 = h('div', 'ligne'); l1.innerHTML = '<div>Héros</div>'; l1.appendChild(sel);
-  pHero.appendChild(l1);
-  pHero.insertAdjacentHTML('beforeend', `<div class="grille2" style="margin-top:6px">
-    <div>Élément</div><div>${badgeElement(hero.element)} ${hero.element ?? 'neutre'}</div>
-    <div>Monture</div><div>${hc.monture.nom}</div>
-    <div>Pets</div><div>${hc.pets.map((p) => `${p.nom} ${badgeElement(p.element)}`).join('<br>')}</div>
-    <div>Gardiens</div><div>${hc.gardiens.map((p) => `${p.nom} ${badgeElement(p.element)}`).join('<br>')}</div>
-    <div>Assistants</div><div>${hc.assistants.map((a) => `${(hc.affichage[a.hero] ?? a.hero)} · tous les ${a.intervalle_tours} tours`).join('<br>')}</div></div>`);
-  m.appendChild(pHero);
-
-  const pInv = h('div', 'panneau');
-  const r = profil.ressources;
-  pInv.innerHTML = `<h3>Inventaire</h3>
-    <div>${QUALITES_CLES.map((q) => `<span class="cle ${q}">${q} ×${profil.cles[q]}</span>`).join('')}</div>
-    <div class="grille2" style="margin-top:6px">
-      <div>Or</div><div>${fmt(fromSave(r.or))}</div><div>Gemmes</div><div>${r.gemmes}</div>
-      <div>XP de héros</div><div>${fmt(fromSave(r.xpHeros))}</div><div>Nourriture</div><div>${fmt(fromSave(r.nourriture))}</div>
-      <div>Ressource permanente</div><div>${fmt(fromSave(r.ressourcePermanente))}</div>
-      <div>Ressource du monde ${info.monde.id}</div><div>${fmt(fromSave(r.ressourceMonde[String(info.monde.id)]))}</div></div>
-    <div class="petit-texte" style="margin-top:4px">Les clés ouvrent les coffres d'épave (non inclus dans ce prototype).</div>`;
-  m.appendChild(pInv);
-
-  const pEl = h('div', 'panneau');
-  pEl.innerHTML = '<h3>Éléments</h3>' + legendeElements(data.heros.elements.fort_contre as Record<string, string>);
-  m.appendChild(pEl);
-
-  const pOpt = h('div', 'panneau');
-  pOpt.innerHTML = `<h3>Options de test</h3>
-    <label class="opt">Abonnement : combats ×2 <input type="checkbox" id="abo" ${profil.parametres.abonne ? 'checked' : ''}></label>
-    <label class="opt">Puissance du joueur
-      <select id="preset">${Object.entries(data.prov.puissance_joueur.ratios).map(([k, v]) => `<option value="${k}" ${k === profil.parametres.preset ? 'selected' : ''}>${k} (×${v})</option>`).join('')}</select></label>
-    <div class="ligne" style="margin-top:6px"><button class="btn petit sec" id="nrj">Recharger l'énergie</button>
-    <button class="btn petit sec" id="exp">Exporter</button><button class="btn petit sec" id="imp">Importer</button><button class="btn petit sec" id="raz">Effacer</button></div>
-    <textarea id="txt" placeholder="Sauvegarde exportée / à importer" style="display:none;margin-top:6px"></textarea>
-    <div class="petit-texte" style="margin-top:6px">Puissance du joueur effective : ×${ratio} par rapport au niveau calibré.</div>`;
-  m.appendChild(pOpt);
-  ui.appendChild(m);
-  ui.appendChild(toastZone);
-
-  (m.querySelector('#prev') as HTMLElement).onclick = () => changerNiveau(-1);
-  (m.querySelector('#next') as HTMLElement).onclick = () => changerNiveau(1);
-  (m.querySelector('#abo') as HTMLInputElement).onchange = (e) => { profil.parametres.abonne = (e.target as HTMLInputElement).checked; save(); };
-  (m.querySelector('#preset') as HTMLSelectElement).onchange = (e) => { profil.parametres.preset = (e.target as HTMLSelectElement).value; save(); afficherMenu(); };
-  (m.querySelector('#nrj') as HTMLElement).onclick = () => { profil.energie = { valeur: data.energie.plafond_regeneration, majLe: maintenant() }; save(); afficherMenu(); };
-  const txt = m.querySelector('#txt') as HTMLTextAreaElement;
-  (m.querySelector('#exp') as HTMLElement).onclick = () => { txt.style.display = 'block'; txt.value = exporter(profil); txt.select(); };
-  (m.querySelector('#imp') as HTMLElement).onclick = () => {
-    if (txt.style.display === 'none' || !txt.value.trim()) { txt.style.display = 'block'; txt.value = ''; txt.placeholder = 'Collez la sauvegarde puis recliquez sur Importer'; return; }
-    try { profil = importer(data, txt.value, maintenant()); save(); afficherMenu(); toast('Sauvegarde importée'); } catch { toast('Sauvegarde invalide'); }
-  };
-  (m.querySelector('#raz') as HTMLElement).onclick = () => {
-    if (confirm('Effacer toute la sauvegarde ?')) { localStorage.removeItem('abyss-legends-save'); profil = charger(data, localStorage, maintenant()); afficherMenu(); }
-  };
+  menuScene.preparer(profil.parametres.heroId, hc.pets, hc.gardiens);
+  ocean.appliquer(niveauPalette(profil.parametres.niveau));
+  ui.replaceChildren(construireMenu(ctxMenu), toastZone);
 }
 
-function changerNiveau(d: number): void {
-  const max = niveauMax(data);
-  profil.parametres.niveau = Math.min(max, Math.max(1, profil.parametres.niveau + d));
-  save();
+function niveauPalette(niveau: number) {
+  return niveauInfo(data, niveau).monde.palette;
+}
+
+function ouvrirReglages(): void {
+  const fermer = () => afficherMenu();
+  const m = construireReglages({
+    ...ctxMenu,
+    exporter: () => exporter(profil),
+    importer: (s) => {
+      try { profil = importer(data, s, maintenant()); save(); toast(t('reglages.importee')); return true; } catch { toast(t('reglages.invalide')); return false; }
+    },
+    effacer: () => { localStorage.removeItem(CLE_STOCKAGE); profil = charger(data, localStorage, maintenant()); appliquerLangue(); },
+    changerLangue: (c) => { profil.parametres.langue = c; save(); appliquerLangue(); ouvrirReglages(); },
+    fermer,
+  });
   afficherMenu();
+  ui.insertBefore(m, toastZone);
+}
+
+function appliquerLangue(): void {
+  definirLangue(profil.parametres.langue, navigator.languages ?? [navigator.language]);
 }
 
 // ---------------------------------------------------------------------------------------------- partie
@@ -170,11 +126,12 @@ function lancerPartie(): void {
   const niveau = profil.parametres.niveau;
   const ratio = (data.prov.puissance_joueur.ratios as Record<string, number>)[profil.parametres.preset] ?? 1;
   partieEnregistree = false;
+  traversee = null;
   run = new Run(data, diff, {
     niveau, heroId: profil.parametres.heroId, ratio, graine: Math.floor(Math.random() * 2 ** 31),
     onMilestone: (ms: Milestone) => {
       const cles = reclamerPalier(profil, data, niveau, ms);
-      if (cles.length) toast(`Clé${cles.length > 1 ? 's' : ''} gagnée${cles.length > 1 ? 's' : ''} : ${cles.join(' + ')} (première fois)`);
+      if (cles.length) toast(t('partie.cles_gagnees', { cles: cles.map((c) => t('cles.' + c)).join(' + ') }));
       save();
     },
   });
@@ -187,107 +144,156 @@ function lancerPartie(): void {
 
 function construireHud(): void {
   ui.replaceChildren();
-  const root = h('div', 'hud');
-  root.style.zIndex = '5';
-  const l1 = h('div', 'ligne');
-  const choix = h('div', 'titre-choix');
-  const pieces = h('div', 'pieces');
-  const vit = h('button', 'btn petit', '×1') as HTMLButtonElement;
-  vit.style.display = profil.parametres.abonne ? '' : 'none';
-  vit.onclick = () => { vitesse = vitesse === 1 ? 2 : 1; vit.textContent = '×' + vitesse; vit.classList.toggle('vit-on', vitesse === 2); };
+  const r = run!;
+  const root = h('div', 'hud-partie');
+  const marques = [...CHOIX_MINIBOSS.map((c) => ({ c, i: ICONES.crane, k: 'crane' })), { c: NB_CHOIX, i: ICONES.couronne, k: 'couronne' }];
+  root.innerHTML = `
+    <div class="ligne">
+      <div class="cadre titre-niveau"><div class="titre-serif" data-r="titre"></div><div class="sous" data-r="sous"></div></div>
+      <button class="rond vitesse" data-r="vit"></button>
+    </div>
+    <div class="progression-30"><div class="piste"><i data-r="piste"></i></div>
+      ${marques.map((m) => `<span class="marque ${m.k}" style="left:${(m.c / NB_CHOIX) * 100}%">${m.i}</span>`).join('')}
+      <span class="curseur" data-r="curseur"></span></div>
+    <div class="ligne">
+      <div class="pill pieces"><i>${ICONES.or}</i><b data-r="pieces"></b></div>
+      <div class="pill xp"><b data-r="niv"></b><div class="barre-xp"><i data-r="xp"></i></div></div>
+    </div>`;
+  const combat = h('div', 'panneau-combat');
+  combat.innerHTML = `
+    <div class="ligne"><span class="titre-serif or">${t('combat.automatique')}</span><span class="petit-texte">${t('combat.aucun_choix')}</span></div>
+    <div class="fiches">
+      <div class="fiche"><div class="ligne"><b>${esc(data.herosContent.affichage[r.opts.heroId] ?? r.opts.heroId)}</b><span data-r="hpHerosTxt"></span></div><div class="barre-vie"><i data-r="hpHeros"></i></div></div>
+      <div class="fiche"><div class="ligne"><b>${esc(data.herosContent.monture.nom)}</b><span data-r="hpMontureTxt"></span></div><div class="barre-vie"><i data-r="hpMonture"></i></div></div>
+    </div>
+    <div class="chips" data-r="chips"></div>
+    <div class="assists" data-r="assist"></div>`;
+  ui.append(root, combat, toastZone);
+  const q = (k: string) => (root.querySelector(`[data-r="${k}"]`) ?? combat.querySelector(`[data-r="${k}"]`)) as HTMLElement;
+  const vit = q('vit') as HTMLButtonElement;
   vitesse = profil.parametres.abonne ? 2 : 1;
-  vit.textContent = '×' + vitesse;
-  vit.classList.toggle('vit-on', vitesse === 2);
-  l1.append(choix, pieces, vit);
-  const hp = h('div', 'barre');
-  const hpFill = h('i'); const hpShield = h('b'); const hpTxt = h('span');
-  hp.append(hpFill, hpShield, hpTxt);
-  const xp = h('div', 'barre xp');
-  const xpFill = h('i'); const xpTxt = h('span');
-  xp.append(xpFill, xpTxt);
-  const chips = h('div', 'chips');
-  root.append(l1, hp, xp, chips);
-  const assist = h('div', 'bas');
-  assist.style.zIndex = '3';
-  ui.append(root, assist, toastZone);
-  hud = { root, choix, pieces, hpFill, hpShield, hpTxt, xpFill, xpTxt, chips, vit, assist, nbMut: -1 };
+  vit.onclick = () => { vitesse = vitesse === 1 ? 2 : 1; majHud(); };
+  hud = {
+    root, titre: q('titre'), sous: q('sous'), piste: q('piste'), curseur: q('curseur'), pieces: q('pieces'), niv: q('niv'), xpFill: q('xp'), vit,
+    combat, hpHeros: q('hpHeros'), hpHerosTxt: q('hpHerosTxt'), hpMonture: q('hpMonture'), hpMontureTxt: q('hpMontureTxt'), chips: q('chips'), assist: q('assist'), nbMut: -1,
+  };
 }
-let vitesse = 1;
+
+function chipsMutations(r: Run): HTMLElement[] {
+  return Object.entries(r.mutations).map(([id, k]) => {
+    const def = data.mutations.mutations.find((x) => x.id === id)!;
+    return h('span', 'chip rar-' + (RARETE_MUTATION[def.rarete] ?? 'commun'), esc(def.nom) + (k > 1 ? ` ×${k}` : ''));
+  });
+}
 
 function majHud(): void {
   if (!run || !hud) return;
-  const hp = run.combat && run.phase === 'combat' ? run.combat.hero.hp : run.hp;
-  const max = run.maxHp();
-  const sh = run.combat && run.phase === 'combat' ? run.combat.shield : D(0);
-  hud.choix.textContent = `Choix ${Math.min(run.step, 30)} / 30`;
-  hud.pieces.textContent = `${run.pieces} pièces`;
-  hud.hpFill.style.width = `${Math.max(0, Math.min(100, hp.div(max).toNumber() * 100))}%`;
-  hud.hpShield.style.width = sh.gt(0) ? `${Math.min(100, sh.div(max).toNumber() * 100)}%` : '0';
-  hud.hpTxt.textContent = `PV ${fmt(hp)} / ${fmt(max)}${sh.gt(0) ? ` (+${fmt(sh)})` : ''}`;
-  hud.xpFill.style.width = `${Math.max(0, Math.min(100, run.xpFraction() * 100))}%`;
-  hud.xpTxt.textContent = `Niveau ${run.niveauHeros}`;
-  const n = Object.values(run.mutations).reduce((a, b) => a + b, 0);
-  if (n !== hud.nbMut) {
-    hud.nbMut = n;
-    hud.chips.replaceChildren(...Object.entries(run.mutations).map(([id, k]) => {
-      const def = data.mutations.mutations.find((x) => x.id === id)!;
-      return h('span', 'chip ' + def.rarete, esc(def.nom) + (k > 1 ? ` ×${k}` : ''));
-    }));
-  }
-  if (run.phase === 'combat' && run.combat) {
-    const c = run.combat;
+  const r = run;
+  const enCombat = r.phase === 'combat' && !!r.combat && !traversee;
+  hud.root.classList.toggle('cache', !!traversee);
+  hud.titre.textContent = `${r.info.monde.nom.toUpperCase()} — ${t('menu.niveau_n', { n: r.opts.niveau })}`;
+  hud.sous.textContent = t('partie.monde_choix', { m: r.info.monde.id, n: Math.min(r.step, NB_CHOIX), max: NB_CHOIX });
+  const prog = (Math.min(r.step, NB_CHOIX) / NB_CHOIX) * 100;
+  hud.piste.style.width = `${prog}%`;
+  hud.curseur.style.left = `${prog}%`;
+  hud.pieces.textContent = String(r.pieces);
+  hud.niv.textContent = t('partie.niv', { n: r.niveauHeros });
+  hud.xpFill.style.width = `${Math.max(0, Math.min(100, r.xpFraction() * 100))}%`;
+  hud.vit.style.display = profil.parametres.abonne && enCombat ? '' : 'none';
+  hud.vit.innerHTML = `<b>×${vitesse}</b>`;
+  hud.vit.classList.toggle('vit-on', vitesse === 2);
+  hud.combat.style.display = enCombat ? '' : 'none';
+  if (enCombat) {
+    const c = r.combat!;
+    const fr = (a: typeof c.hero) => (a.maxHp.gt(0) ? Math.max(0, Math.min(100, a.hp.div(a.maxHp).toNumber() * 100)) : 0);
+    hud.hpHeros.style.width = `${fr(c.hero)}%`;
+    hud.hpHerosTxt.textContent = `${fmt(c.hero.hp)}/${fmt(c.hero.maxHp)}${c.shield.gt(0) ? ` (+${fmt(c.shield)})` : ''}`;
+    hud.hpMonture.style.width = `${fr(c.mount)}%`;
+    hud.hpMontureTxt.textContent = c.mount.alive ? `${fmt(c.mount.hp)}/${fmt(c.mount.maxHp)}` : t('combat.monture_ko');
     hud.assist.innerHTML = data.herosContent.assistants.map((a, i) => {
-      const need = Math.max(1, a.intervalle_tours - (run!.stats().assistReduce ?? 0));
+      const need = Math.max(1, a.intervalle_tours - (r.stats().assistReduce ?? 0));
       return `<span class="assist">${esc(data.herosContent.affichage[a.hero] ?? a.hero)} : ${c.assistCounters[i]} / ${need}</span>`;
     }).join(' ');
-    hud.assist.style.display = '';
-  } else hud.assist.style.display = 'none';
-  hud.vit.style.display = profil.parametres.abonne ? '' : 'none';
+    const n = Object.values(r.mutations).reduce((a, b) => a + b, 0);
+    if (n !== hud.nbMut) { hud.nbMut = n; hud.chips.replaceChildren(...chipsMutations(r)); }
+  } else hud.nbMut = -1;
 }
 
 // ---------------------------------------------------------------------------------------------- phases
 function cleModal(): string {
   if (!run) return '';
-  return [run.phase, run.step, run.offre.map((o) => o.id).join(','), run.rencontre?.etat ?? '', run.nbMutations, run.shop ? run.shop.slots.map((s) => s.achete).join('') : ''].join('|');
+  return [run.phase, run.step, run.offre.map((o) => o.id).join(','), run.rencontre?.etat ?? '', run.nbMutations, run.shop ? run.shop.slots.map((s) => s.achete).join('') : '', run.nbCombats].join('|');
 }
 
 function syncPhase(): void {
-  if (!run) return;
+  if (!run || traversee) return;
   const cle = cleModal();
   if (cle === phaseAffichee) return;
   phaseAffichee = cle;
-  document.querySelectorAll('.modal').forEach((e) => e.remove());
+  document.querySelectorAll('.modal, .sonar-ui').forEach((e) => e.remove());
   ocean.appliquer(run.info.monde.palette);
   majHud();
   switch (run.phase) {
-    case 'sonar': {
-      combatView.visible = false;
-      sonar.visible = true;
-      sonar.afficher(data, run.info, run.echos, (i) => { run!.chooseEcho(i); syncPhase(); });
-      const t = h('div', 'sonar-titre');
-      t.className = 'modal sonar-titre-wrap';
-      t.style.cssText = 'background:none;pointer-events:none;justify-content:flex-end;padding:0 0 300px';
-      t.innerHTML = `<div class="sonar-titre" style="position:static"><div class="t1">Choix ${run.step} / 30 · ${run.step === 30 ? 'Le gardien vous attend' : run.step === 10 || run.step === 20 ? 'Un mini-boss barre la route' : 'Où aller ?'}</div><div class="t2">Touchez une silhouette pour plonger</div></div>`;
-      ui.appendChild(t);
-      break;
-    }
+    case 'sonar': afficherSonar(); break;
     case 'combat':
-      sonar.visible = false;
-      combatView.visible = true;
+      afficherScene('combat');
       combatView.demarrer(run);
       break;
-    case 'mutation': afficherMutation(); break;
-    case 'shop': afficherShop(); break;
-    case 'rencontre': afficherRencontre(); break;
+    case 'mutation':
+      if (!combatView.visible) afficherScene('aucune'); // apres un combat, la scene du combat reste en fond
+      afficherMutation();
+      break;
+    case 'shop': afficherScene('aucune'); afficherShop(); break;
+    case 'rencontre': afficherScene('aucune'); afficherRencontre(); break;
     case 'victoire':
     case 'defaite': afficherFin(); break;
   }
 }
 
+/** Ecran du Sonar : 3 echos identiques (la vue ne connait que leur nombre), boutons Gauche / Devant / Droite. */
+function afficherSonar(): void {
+  const r = run!;
+  afficherScene('sonar');
+  sonar.afficher(r.echos.length, (i) => choisirEcho(i));
+  const bas = h('div', 'sonar-ui');
+  const dirs = [['gauche', ICONES.gauche], ['devant', ICONES.devant], ['droite', ICONES.droite]];
+  bas.innerHTML = `
+    <div class="sonar-message">${t('sonar.message')}</div>
+    <div class="sonar-boutons">${dirs.map(([k, ic], i) => `<button class="btn-direction" data-echo="${i}">${ic}<span>${t('sonar.' + k)}</span></button>`).join('')}</div>
+    <div class="sonar-etat"><div class="pv-mini"><span>${t('partie.pv')}</span><div class="barre-vie"><i style="width:${Math.max(0, Math.min(100, r.hp.div(r.maxHp()).toNumber() * 100))}%"></i></div><b>${fmt(r.hp)}/${fmt(r.maxHp())}</b></div>
+    <div class="chips"></div></div>`;
+  bas.querySelector('.chips')!.replaceChildren(...chipsMutations(r));
+  bas.querySelectorAll<HTMLButtonElement>('.btn-direction').forEach((b) => { b.onclick = () => sonar.choisir(Number(b.dataset.echo)); });
+  ui.insertBefore(bas, toastZone);
+}
+
+/** Le joueur a choisi un echo : la logique resout le choix, puis la traversee de l'eau (2,5 s) mene a la rencontre. */
+function choisirEcho(i: number): void {
+  const r = run!;
+  if (r.phase !== 'sonar' || traversee) return;
+  r.chooseEcho(i);
+  traversee = new Traversee(DUREE_TRAVERSEE_S);
+  horlogeTraversee = 0;
+  document.querySelectorAll('.sonar-ui').forEach((e) => e.remove());
+  traverseeView.demarrer(r.opts.heroId, r.info.monde.palette, revelation(r), DUREE_TRAVERSEE_S);
+  majHud();
+}
+
+function revelation(r: Run): Revelation {
+  const coul = (e: Element | null) => (e ? num(ELEMENT_COULEUR[e]) : 0x9fb4c0);
+  if (r.phase === 'combat' && r.combat) {
+    const e = r.combat.enemies[0];
+    const noms = [...new Set(r.combat.enemies.map((x) => x.nom))];
+    return { titre: noms.slice(0, 2).join(' · ').toUpperCase(), sous: (e.element ?? t('commun.neutre')).toUpperCase(), couleur: coul(e.element) };
+  }
+  if (r.phase === 'shop') return { titre: t('rencontre.marchand').toUpperCase(), sous: '', couleur: 0xf0a838 };
+  if (r.phase === 'rencontre' && r.rencontre) return { titre: r.rencontre.titre.toUpperCase(), sous: '', couleur: 0x7af4ff };
+  return { titre: '', sous: '', couleur: 0x7af4ff };
+}
+
 function modal(): HTMLElement {
   const m = h('div', 'modal');
-  m.style.zIndex = '4';
-  ui.appendChild(m);
+  ui.insertBefore(m, toastZone);
   return m;
 }
 
@@ -295,14 +301,15 @@ function afficherMutation(): void {
   const r = run!;
   const m = modal();
   const b = r.butin;
-  const titre = r.offreSource === 'combat' ? (b?.kind === 'miniboss' ? 'Mini-boss vaincu !' : 'Victoire !') : r.offreSource === 'shop' ? 'Achat : choisissez' : 'Une mutation vous est offerte';
+  const titre = r.offreSource === 'combat' ? (b?.kind === 'miniboss' ? t('mutation.miniboss_vaincu') : t('mutation.victoire')) : r.offreSource === 'shop' ? t('mutation.achat') : t('mutation.offerte');
   m.appendChild(h('h2', '', titre));
-  if (b && r.offreSource === 'combat') m.appendChild(h('div', 'recompense', `+${b.xp} XP · +${b.pieces} pièces${b.niveaux ? ` · <b>Niveau ${r.niveauHeros} !</b>` : ''}`));
-  m.appendChild(h('div', 'sous', 'Choisissez 1 mutation parmi 3 (perdues en fin de partie)'));
+  if (b && r.offreSource === 'combat') m.appendChild(h('div', 'recompense', `+${b.xp} XP · +${b.pieces} ${t('partie.pieces')}${b.niveaux ? ` · <b>${t('partie.niv', { n: r.niveauHeros })} !</b>` : ''}`));
+  m.appendChild(h('div', 'sous', t('mutation.consigne')));
   r.offre.forEach((mu, i) => {
     const k = r.mutations[mu.id] ?? 0;
     const rar = data.mutations.raretes[mu.rarete];
-    const c = h('button', 'carte ' + mu.rarete, `<span class="pile">${k ? `possédée ×${k} → ×${k + 1}` : 'nouvelle'}</span><div class="rar" style="color:${rar.couleur}">${rar.nom}${mu.element ? ' · ' + mu.element : ''}</div><div class="nom">${esc(mu.nom)}</div><div class="desc">${esc(mu.description)}</div>`);
+    const cls = RARETE_MUTATION[mu.rarete] ?? 'commun';
+    const c = h('button', 'carte rar-' + cls, `<span class="pile">${k ? t('mutation.possedee', { k, k1: k + 1 }) : t('mutation.nouvelle')}</span><div class="rar">${rar.nom}${mu.element ? ' · ' + mu.element : ''}</div><div class="nom">${esc(mu.nom)}</div><div class="desc">${esc(mu.description)}</div>`);
     c.onclick = () => { r.pickMutation(i); syncPhase(); };
     m.appendChild(c);
   });
@@ -311,17 +318,17 @@ function afficherMutation(): void {
 function afficherShop(): void {
   const r = run!;
   const m = modal();
-  m.appendChild(h('h2', '', 'Marchand'));
-  m.appendChild(h('div', 'sous', `Vous avez ${r.pieces} pièces de partie`));
+  m.appendChild(h('h2', '', t('rencontre.marchand')));
+  m.appendChild(h('div', 'sous', t('shop.pieces', { n: r.pieces })));
   r.shop!.slots.forEach((s, i) => {
     const prix = Math.round(s.article.prix * (1 + 0.5 * s.achete));
     const epuise = s.achete >= s.article.max;
-    const c = h('button', 'carte', `<span class="pile">${epuise ? 'épuisé' : prix + ' pièces'}</span><div class="nom">${esc(s.article.nom)}</div><div class="desc">${esc(s.article.description)}</div>`);
+    const c = h('button', 'carte', `<span class="pile">${epuise ? t('shop.epuise') : prix + ' ' + t('partie.pieces')}</span><div class="nom">${esc(s.article.nom)}</div><div class="desc">${esc(s.article.description)}</div>`);
     if (epuise || r.pieces < prix) c.setAttribute('disabled', '');
     c.onclick = () => { if (r.acheter(i)) { phaseAffichee = ''; syncPhase(); majHud(); } };
     m.appendChild(c);
   });
-  const q = h('button', 'btn', 'Quitter le marchand');
+  const q = h('button', 'btn', t('shop.quitter'));
   q.onclick = () => { r.quitterShop(); syncPhase(); };
   m.appendChild(q);
 }
@@ -351,51 +358,73 @@ function afficherFin(): void {
   }
   const rec = lastRecompense!;
   const m = modal();
-  m.appendChild(h('h2', '', victoire ? 'Niveau terminé !' : 'Vous avez péri...'));
-  m.appendChild(h('div', 'sous', victoire ? `${esc(r.info.boss.nom)} est vaincu.` : `La partie s'arrête au choix ${r.step}. Les mutations sont perdues.`));
-  m.appendChild(h('div', 'recompense', `Gains : ${fmt(rec.or)} or · ${fmt(rec.xpHeros)} XP de héros · ${fmt(rec.nourriture)} nourriture${rec.gemmes ? ` · ${rec.gemmes} gemmes` : ''}`));
-  m.appendChild(h('div', 'recompense', `Combats : ${r.nbCombats} · Mutations : ${r.nbMutations} · Niveau de partie : ${r.niveauHeros}`));
+  m.appendChild(h('h2', '', victoire ? t('fin.victoire') : t('fin.defaite')));
+  m.appendChild(h('div', 'sous', victoire ? t('fin.boss_vaincu', { nom: esc(r.info.boss.nom) }) : t('fin.arret', { n: r.step })));
+  m.appendChild(h('div', 'recompense', t('fin.gains', { or: fmt(rec.or), xp: fmt(rec.xpHeros), nourriture: fmt(rec.nourriture) }) + (rec.gemmes ? ` · ${rec.gemmes} ${t('ressources.gemmes')}` : '')));
+  m.appendChild(h('div', 'recompense', t('fin.bilan', { c: r.nbCombats, m: r.nbMutations, n: r.niveauHeros })));
   if (victoire && r.opts.niveau === profil.parametres.niveau && profil.parametres.niveau < niveauMax(data)) {
-    const nx = h('button', 'btn', 'Niveau suivant');
+    const nx = h('button', 'btn', t('fin.suivant'));
     nx.onclick = () => { profil.parametres.niveau++; save(); afficherMenu(); };
     m.appendChild(nx);
   }
-  const rej = h('button', 'btn', 'Rejouer ce niveau');
+  const rej = h('button', 'btn', t('fin.rejouer'));
   if (energieActuelle(profil, data, maintenant()) < data.energie.cout_tentative) rej.setAttribute('disabled', '');
   rej.onclick = () => lancerPartie();
-  const menu = h('button', 'btn sec', 'Écran principal');
+  const menu = h('button', 'btn sec', t('fin.menu'));
   menu.onclick = () => afficherMenu();
   m.append(rej, menu);
 }
-let lastRecompense: ReturnType<typeof terminerPartie> | null = null;
 
 // ---------------------------------------------------------------------------------------------- boucle
 function frame(dtReel: number): void {
-  ocean.tick(dtReel);
-  if (run) {
-    for (const t of run.toasts.splice(0)) toast(t);
-    if (run.phase === 'combat') {
-      run.update(dtReel * vitesse * timeScale);
-      combatView.maj(dtReel * timeScale, vitesse);
+  const dt = dtReel * timeScale;
+  ocean.tick(dt);
+  if (!run) { menuScene.maj(dt); return; }
+  for (const msg of run.toasts.splice(0)) toast(msg);
+  if (traversee) {
+    // la traversee avance en temps reel : l'abonnement (x2) ne l'accelere pas
+    horlogeTraversee += dt;
+    traversee.avancer(dt, vitesse);
+    traverseeView.maj(dt); // meme horloge que la minuterie (la revelation tombe a la fin)
+    if (traversee.t < FERMETURE_SONAR_S) {
+      afficherScene('sonar');
+      sonar.fermeture(traversee.t / FERMETURE_SONAR_S);
+      sonar.maj(dt);
+    } else afficherScene('traversee');
+    if (traversee.finie) {
+      traversee = null;
+      phaseAffichee = '';
+      syncPhase();
     }
-    if (run.phase === 'sonar') sonar.maj(dtReel);
     majHud();
-    syncPhase();
+    return;
   }
+  if (run.phase === 'combat') {
+    const dtCombat = dt * facteurTemps('combat', vitesse);
+    run.update(dtCombat);
+    combatView.maj(dt, facteurTemps('combat', vitesse));
+  }
+  if (run.phase === 'sonar') sonar.maj(dt);
+  majHud();
+  syncPhase();
 }
 
 async function init(): Promise<void> {
+  appliquerTheme();
+  appliquerLangue();
   fit();
   window.addEventListener('resize', fit);
   await app.init({ width: W, height: H, background: '#06243f', antialias: true, resolution: Math.min(3, (window.devicePixelRatio || 1) * 1.5), autoDensity: true, preference: 'webgl' });
   document.getElementById('canvas-host')!.appendChild(app.canvas);
+  await prechargerRigs();
   ocean = new Ocean(W, H);
+  menuScene = new MenuScene();
   sonar = new SonarView();
+  traverseeView = new TraverseeView();
   combatView = new CombatView();
-  sonar.visible = false;
-  combatView.visible = false;
-  app.stage.addChild(ocean, sonar, combatView);
-  app.ticker.add((t) => frame(t.deltaMS / 1000));
+  app.stage.addChild(ocean, menuScene, combatView, traverseeView, sonar);
+  afficherScene('aucune');
+  app.ticker.add((tk) => frame(tk.deltaMS / 1000));
   setInterval(save, 10000);
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
@@ -407,10 +436,16 @@ async function init(): Promise<void> {
     get profil() { return profil; },
     get timeScale() { return timeScale; },
     set timeScale(v: number) { timeScale = v; },
+    get enTraversee() { return !!traversee; },
+    get traversee() { return traversee; },
+    get horlogeTraversee() { return horlogeTraversee; },
+    get vitesse() { return vitesse; },
     menu: afficherMenu,
     lancer: lancerPartie,
     sonar: () => sonar,
-    ELEMENT_COULEUR,
+    combatView: () => combatView,
+    scenes: () => ({ menu: menuScene.visible, sonar: sonar.visible, traversee: traverseeView.visible, combat: combatView.visible }),
+    zero: D(0),
   };
 }
 init();

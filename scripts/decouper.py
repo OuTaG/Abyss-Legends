@@ -8,9 +8,11 @@ src, out = sys.argv[1], sys.argv[2]
 img = np.asarray(Image.open(src).convert("RGB")).astype(np.int16)
 r, g, b = img[..., 0], img[..., 1], img[..., 2]
 fond = (g > r + 40) & (g > b + 40)
-alpha = np.where(fond, 0, 255).astype(np.uint8)
+# alpha progressif sur les bords (pas d'escalier)
+d = g - np.maximum(r, b)
+alpha = (np.clip((70 - d) / 40.0, 0, 1) * 255).astype(np.uint8)
 # atténue le liseré vert sur les bords
-spill = (~fond) & (g > np.maximum(r, b))
+spill = g > np.maximum(r, b)
 img[..., 1] = np.where(spill, np.maximum(r, b), g)
 
 # étiquetage des zones opaques sur une version réduite
@@ -44,7 +46,12 @@ for i, (lid, y0, y1, x0, x1) in enumerate(sorted(boites, key=lambda t: (t[1], t[
     y1, x1 = min(rgba.shape[0], y1+m), min(rgba.shape[1], x1+m)
     piece = rgba[y0:y1, x0:x1].copy()
     # garde uniquement la composante courante
-    masque = np.kron(lab == lid, np.ones((k, k), bool))[:rgba.shape[0], :rgba.shape[1]][y0:y1, x0:x1]
+    bloc = np.kron(lab == lid, np.ones((k, k), bool))[:rgba.shape[0], :rgba.shape[1]][y0:y1, x0:x1]
+    # élargit le masque de la pièce pour ne pas rogner ses bords en escalier
+    masque = bloc.copy()
+    for dy in range(-2 * k, 2 * k + 1, 2):
+        for dx in range(-2 * k, 2 * k + 1, 2):
+            masque |= np.roll(np.roll(bloc, dy, 0), dx, 1)
     piece[..., 3] = np.where(masque, piece[..., 3], 0)
     nom = f"piece_{i:02d}.png"
     Image.fromarray(piece).save(f"{out}/{nom}")
